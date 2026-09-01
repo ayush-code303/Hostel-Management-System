@@ -1,0 +1,155 @@
+================================================================================
+          HOSTEL MANAGEMENT SYSTEM - MASTER EXECUTION PLAN (plan.txt)
+================================================================================
+Project Type: College Mini Project / Project-Based Learning (PBL)
+Group Size: 4 Members (Ayush, Bhoomi, Anushka, Palak)
+Methodology: Educational Bottom-Up Approach with 4-Member Parallel Execution
+Architectural Stack: React.js (Vite) + Node.js + Express.js + MongoDB (Mongoose)
+Supporting Services: Cloudinary, Razorpay, Socket.IO, Firebase
+Deployment: Vercel (Frontend), Render (Backend), MongoDB Atlas (Database)
+================================================================================
+
+--------------------------------------------------------------------------------
+1. PROJECT PHILOSOPHY & WORKFLOW STRATEGY
+--------------------------------------------------------------------------------
+This project follows a step-by-step, educational project-based learning model.
+While executed in a single environment, the work is divided across 4 distinct 
+member roles operating in parallel, starting from basic scratch:
+
+1. PALAK (Docs & Planning Lead): 
+   - Starts FIRST by creating structured markdown documentation in `docs/`.
+   - Owns operational modules (Attendance, Leave, Visitors), Postman QA, and final docs.
+
+2. ANUSHKA (Auth UI & Admin Operations Developer): 
+   - Starts by creating basic Login & Register interface code.
+   - Owns Admin/Warden operational views, student tables, room management, and complaint resolution UI.
+
+3. BHOOMI (Frontend Lead & Student Portal): 
+   - Starts by building basic website layout (Navbar, Sidebar) and Admin Dashboard UI skeleton.
+   - Owns the complete Student Portal UI (Dashboard, Room Application, Fee view, Complaints, Notices).
+
+4. AYUSH (Lead Architect & Backend Developer): 
+   - Starts backend from scratch: folder structure setup, selecting dependencies, basic Express server.
+   - Owns MongoDB models, REST APIs, JWT/RBAC security, business logic, integrations, and deployment.
+
+--------------------------------------------------------------------------------
+2. PHASED EXECUTION ROADMAP
+--------------------------------------------------------------------------------
+
+================================================================================
+PHASE 1: BASIC SCRATCH KICKOFF (4-MEMBER PARALLEL INITIATION)
+================================================================================
+
+[ ] Step 1.1: Documentation & Planning Baseline (PALAK WORK)
+    - Create `docs/` folder.
+    - Create `docs/01_project_overview.md` (Scope, objectives, problem statement, tech stack).
+    - Create `docs/02_team_work_distribution.md` (Role breakdown, responsibility matrix for 4 members).
+    - Create `docs/03_system_architecture.md` (MERN architecture, API conventions, DB layout).
+    - Create `docs/04_folder_structure.md` (Directory tree explanation for client and server).
+
+[ ] Step 1.2: Basic Authentication UI (ANUSHKA WORK)
+    - Create basic Login UI (`client/src/pages/auth/Login.jsx`).
+    - Create basic Register UI (`client/src/pages/auth/Register.jsx`).
+    - Implement simple form input handling and clean styling layout.
+
+[ ] Step 1.3: Website Layout & Admin Dashboard Skeleton (BHOOMI WORK)
+    - Initialize Vite + React + Tailwind CSS in `client/`.
+    - Setup base App structure, Navbar, Sidebar, and Main Layout wrappers (`client/src/layouts/`).
+    - Create basic Admin Dashboard layout skeleton (`client/src/pages/admin/AdminDashboard.jsx`).
+
+[ ] Step 1.4: Backend Folder Structure & Dependency Setup (AYUSH WORK)
+    - Initialize Node.js project in `server/`.
+    - Create folder hierarchy: `config/`, `controllers/`, `middleware/`, `models/`, 
+      `routes/`, `services/`, `utils/`, `validators/`.
+    - Create `server/package.json` with required backend packages (`express`, 
+      `mongoose`, `dotenv`, `cors`, `jsonwebtoken`, `bcryptjs`, `express-validator`).
+    - Write initial `server/server.js` boilerplate and basic health check route `/api/health`.
+
+================================================================================
+PHASE 2: DATABASE SCHEMAS & BACKEND INFRASTRUCTURE (AYUSH WORK)
+================================================================================
+[ ] Step 2.1: MongoDB Connection Setup (`server/config/db.js`).
+
+[ ] Step 2.2: Define 13 Mongoose Schemas (`server/models/`)
+    - `User.js` (name, email, password, role, avatar, isActive)
+    - `Student.js` (rollNumber, department, year, phone, guardian, roomAllocation)
+    - `Hostel.js` (name, code, totalFloors, totalRooms, capacity, gender, warden)
+    - `Room.js` (hostel, roomNumber, floor, capacity, occupied, feeAmount, status)
+    - `Allocation.js` (student, hostel, room, startDate, status)
+    - `Fee.js` (student, term, amount, dueDate, status)
+    - `Payment.js` (fee, student, transactionId, paymentMethod, status)
+    - `Complaint.js` (student, category, subject, description, priority, status)
+    - `Notice.js` (title, content, targetAudience, category, publishedBy)
+    - `Attendance.js` (student, date, status, markedBy)
+    - `Leave.js` (student, startDate, endDate, reason, status, reviewedBy)
+    - `Visitor.js` (student, visitorName, relation, phone, entryTime, exitTime, status)
+    - `Notification.js` (recipient, title, message, link, isRead)
+
+[ ] Step 2.3: JWT Auth & RBAC Security Middleware (`server/middleware/`)
+    - `authMiddleware.js`: Token verification & payload extraction.
+    - `rbacMiddleware.js`: Role checking (`admin`, `warden`, `student`).
+    - Standardized API Response Helper (`server/utils/response.js`).
+
+================================================================================
+PHASE 3: REST API ENDPOINTS DEVELOPMENT (AYUSH WORK)
+================================================================================
+[ ] Step 3.1: Auth APIs (`/api/auth` - Login, Register, Profile Me).
+[ ] Step 3.2: Student Management APIs (`/api/students` - CRUD & search).
+[ ] Step 3.3: Hostel & Room APIs (`/api/hostels`, `/api/rooms` - CRUD & availability).
+[ ] Step 3.4: Room Allocation APIs (`/api/allocations` - Capacity enforcement logic).
+[ ] Step 3.5: Fee & Payment APIs (`/api/fees`, `/api/payments`).
+[ ] Step 3.6: Complaint APIs (`/api/complaints` - Create, List, Update Status).
+[ ] Step 3.7: Attendance, Leave & Visitor APIs (`/api/attendance`, `/api/leave`, `/api/visitors`).
+[ ] Step 3.8: Notice & Notification APIs (`/api/notices`, `/api/notifications`).
+
+================================================================================
+PHASE 4: STUDENT PORTAL FRONTEND (BHOOMI WORK)
+================================================================================
+[ ] Step 4.1: Student Protected Router (`/student/*`).
+[ ] Step 4.2: Student Dashboard (`/student/dashboard` - Room status, fees, complaints, notices).
+[ ] Step 4.3: Student Profile & Document Upload (`/student/profile`).
+[ ] Step 4.4: Hostel Room Application & Status View (`/student/room`).
+[ ] Step 4.5: Fee Details & Online Payment UI (`/student/fees`).
+[ ] Step 4.6: Complaint Submission & Live Tracker (`/student/complaints`).
+[ ] Step 4.7: Leave Request Application (`/student/leave`).
+[ ] Step 4.8: Student Notice Board & Alerts (`/student/notices`).
+
+================================================================================
+PHASE 5: ADMIN & WARDEN OPERATIONS FRONTEND (ANUSHKA WORK)
+================================================================================
+[ ] Step 5.1: Integrate Auth UI (Login/Register) with Backend APIs & Axios.
+[ ] Step 5.2: Admin Operational Dashboard (`/admin/dashboard` - Analytics metrics & charts).
+[ ] Step 5.3: Student Directory Table (`/admin/students` - Search, filter, edit, delete).
+[ ] Step 5.4: Hostel & Floor/Block Management UI (`/admin/hostels`).
+[ ] Step 5.5: Room CRUD & Capacity Visualizer (`/admin/rooms`).
+[ ] Step 5.6: Room Allocation Workstation (`/admin/allocations` - Real-time validation).
+[ ] Step 5.7: Fee Management Console (`/admin/fees` - Generation & verification).
+[ ] Step 5.8: Complaint Triage & Resolution Desk (`/admin/complaints`).
+[ ] Step 5.9: Notice Publisher Desk (`/admin/notices`).
+
+================================================================================
+PHASE 6: OPERATIONAL MODULES, TESTING & QA (PALAK WORK)
+================================================================================
+[ ] Step 6.1: Attendance Management System
+    - Warden Attendance Marking Desk (`/warden/attendance`).
+    - Student Attendance History & Calendar View (`/student/attendance`).
+[ ] Step 6.2: Leave Request Approval Workflow (`/admin/leave` - Approve/Reject with remarks).
+[ ] Step 6.3: Visitor Entry & Exit Logger UI (`/admin/visitors` - Entry log, Mark exit).
+[ ] Step 6.4: Postman API Test Collection (`docs/Hostel_Management_API.postman_collection.json`).
+[ ] Step 6.5: End-to-End Functional QA & Role Security Checks.
+[ ] Step 6.6: Comprehensive User Manual (`docs/05_user_manual.md`).
+
+================================================================================
+PHASE 7: THIRD-PARTY INTEGRATIONS & REAL-TIME SERVICES
+================================================================================
+[ ] Step 7.1: Cloudinary Upload Integration (Document/Avatar handling).
+[ ] Step 7.2: Razorpay Payment Gateway Sandbox Integration.
+[ ] Step 7.3: Socket.IO Real-Time Alerts (Complaints & Notice broadcasts).
+
+================================================================================
+PHASE 8: PRODUCTION HARDENING, DEPLOYMENT & FINAL HANDOFF
+================================================================================
+[ ] Step 8.1: Security & Production Hardening (Helmet, Rate Limiting, CORS).
+[ ] Step 8.2: Deployment Setup (Vercel Client, Render Server, MongoDB Atlas DB).
+[ ] Step 8.3: Final Project README update & College Project Defense Readiness.
+================================================================================
