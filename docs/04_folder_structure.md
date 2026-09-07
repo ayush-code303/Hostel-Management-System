@@ -64,7 +64,7 @@ Hostel-Management-System/
 
 - `docs/` -> Owned by **Palak**
 - `server/` -> Architecture & APIs owned by **Ayush**
-- `client/src/pages/auth/` -> Auth UI created by **Anushka**
-- `client/src/layouts/`, `client/src/components/`, `client/src/pages/student/` -> Frontend layout & Student portal owned by **Bhoomi**
-- `client/src/pages/admin/` -> Admin operations owned by **Anushka**
+- `client/src/pages/auth/` -> Auth UI created by **Bhoomi**
+- `client/src/layouts/`, `client/src/components/`, `client/src/pages/student/` -> Frontend layout & Student portal owned by **Anushka**
+- `client/src/pages/admin/` -> Admin operations owned by **Bhoomi**
 - `client/src/pages/warden/` -> Operational modules owned by **Palak**

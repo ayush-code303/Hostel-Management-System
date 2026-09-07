@@ -49,8 +49,8 @@ git commit -m "feat(backend): initialize express server boilerplate, package dep
 
 ---
 
-### 3. 🎨 BHOOMI PURUSHWANI (Frontend Lead & Layout Architect)
-**Branch Name:** `feature/bhoomi-student`
+### 3. 🎨 ANUSHKA UPADHYAY (Frontend Lead & Layout Architect)
+**Branch Name:** `feature/anushka-student`
 
 #### Created Files:
 - `client/package.json` — React + Vite + Tailwind CSS package manifest.
@@ -66,25 +66,25 @@ git commit -m "feat(backend): initialize express server boilerplate, package dep
 - `client/src/layouts/MainLayout.jsx` — Main layout wrapper combining Navbar and Sidebar.
 - `client/src/pages/admin/AdminDashboard.jsx` — Admin dashboard skeleton with stat cards & activity feed.
 
-#### Suggested Git Commands for Bhoomi:
+#### Suggested Git Commands for Anushka:
 ```bash
-git checkout -b feature/bhoomi-student
+git checkout -b feature/anushka-student
 git add client/package.json client/vite.config.js client/tailwind.config.js client/postcss.config.js client/index.html client/src/index.css client/src/main.jsx client/src/App.jsx client/src/components/ client/src/layouts/ client/src/pages/admin/AdminDashboard.jsx
 git commit -m "feat(frontend): setup vite react tailwind scaffold, navbar sidebar layouts, and admin dashboard skeleton"
 ```
 
 ---
 
-### 4. 🔐 ANUSHKA UPADHYAY (Auth UI Developer)
-**Branch Name:** `feature/anushka-admin`
+### 4. 🔐 BHOOMI PURUSHWANI (Auth UI Developer)
+**Branch Name:** `feature/bhoomi-admin`
 
 #### Created Files:
 - `client/src/pages/auth/Login.jsx` — Responsive login UI with role selector (Student/Warden/Admin).
 - `client/src/pages/auth/Register.jsx` — Responsive student registration form UI.
 
-#### Suggested Git Commands for Anushka:
+#### Suggested Git Commands for Bhoomi:
 ```bash
-git checkout -b feature/anushka-admin
+git checkout -b feature/bhoomi-admin
 git add client/src/pages/auth/Login.jsx client/src/pages/auth/Register.jsx
 git commit -m "feat(auth-ui): implement responsive login and student registration interface screens"
 ```

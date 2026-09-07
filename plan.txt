@@ -2,7 +2,7 @@
           HOSTEL MANAGEMENT SYSTEM - MASTER EXECUTION PLAN (plan.txt)
 ================================================================================
 Project Type: College Mini Project / Project-Based Learning (PBL)
-Group Size: 4 Members (Ayush, Bhoomi, Anushka, Palak)
+Group Size: 4 Members (Ayush, Anushka, Bhoomi, Palak)
 Methodology: Educational Bottom-Up Approach with 4-Member Parallel Execution
 Architectural Stack: React.js (Vite) + Node.js + Express.js + MongoDB (Mongoose)
 Supporting Services: Cloudinary, Razorpay, Socket.IO, Firebase
@@ -20,11 +20,11 @@ member roles operating in parallel, starting from basic scratch:
    - Starts FIRST by creating structured markdown documentation in `docs/`.
    - Owns operational modules (Attendance, Leave, Visitors), Postman QA, and final docs.
 
-2. ANUSHKA (Auth UI & Admin Operations Developer): 
+2. BHOOMI (Auth UI & Admin Operations Developer): 
    - Starts by creating basic Login & Register interface code.
    - Owns Admin/Warden operational views, student tables, room management, and complaint resolution UI.
 
-3. BHOOMI (Frontend Lead & Student Portal): 
+3. ANUSHKA (Frontend Lead & Student Portal): 
    - Starts by building basic website layout (Navbar, Sidebar) and Admin Dashboard UI skeleton.
    - Owns the complete Student Portal UI (Dashboard, Room Application, Fee view, Complaints, Notices).
 
@@ -47,12 +47,12 @@ PHASE 1: BASIC SCRATCH KICKOFF (4-MEMBER PARALLEL INITIATION)
     - Create `docs/03_system_architecture.md` (MERN architecture, API conventions, DB layout).
     - Create `docs/04_folder_structure.md` (Directory tree explanation for client and server).
 
-[ ] Step 1.2: Basic Authentication UI (ANUSHKA WORK)
+[ ] Step 1.2: Basic Authentication UI (BHOOMI WORK)
     - Create basic Login UI (`client/src/pages/auth/Login.jsx`).
     - Create basic Register UI (`client/src/pages/auth/Register.jsx`).
     - Implement simple form input handling and clean styling layout.
 
-[ ] Step 1.3: Website Layout & Admin Dashboard Skeleton (BHOOMI WORK)
+[ ] Step 1.3: Website Layout & Admin Dashboard Skeleton (ANUSHKA WORK)
     - Initialize Vite + React + Tailwind CSS in `client/`.
     - Setup base App structure, Navbar, Sidebar, and Main Layout wrappers (`client/src/layouts/`).
     - Create basic Admin Dashboard layout skeleton (`client/src/pages/admin/AdminDashboard.jsx`).
@@ -103,7 +103,7 @@ PHASE 3: REST API ENDPOINTS DEVELOPMENT (AYUSH WORK)
 [ ] Step 3.8: Notice & Notification APIs (`/api/notices`, `/api/notifications`).
 
 ================================================================================
-PHASE 4: STUDENT PORTAL FRONTEND (BHOOMI WORK)
+PHASE 4: STUDENT PORTAL FRONTEND (ANUSHKA WORK)
 ================================================================================
 [ ] Step 4.1: Student Protected Router (`/student/*`).
 [ ] Step 4.2: Student Dashboard (`/student/dashboard` - Room status, fees, complaints, notices).
@@ -115,7 +115,7 @@ PHASE 4: STUDENT PORTAL FRONTEND (BHOOMI WORK)
 [ ] Step 4.8: Student Notice Board & Alerts (`/student/notices`).
 
 ================================================================================
-PHASE 5: ADMIN & WARDEN OPERATIONS FRONTEND (ANUSHKA WORK)
+PHASE 5: ADMIN & WARDEN OPERATIONS FRONTEND (BHOOMI WORK)
 ================================================================================
 [ ] Step 5.1: Integrate Auth UI (Login/Register) with Backend APIs & Axios.
 [ ] Step 5.2: Admin Operational Dashboard (`/admin/dashboard` - Analytics metrics & charts).

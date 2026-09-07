@@ -10,15 +10,15 @@
 | Member Name | Designated Role | Primary Focus Area | Workload % |
 | :--- | :--- | :--- | :--- |
 | **Ayush** | Lead Developer & Architect | System Architecture, MongoDB Schemas, Express REST APIs, JWT/RBAC Security, Business Logic, Integrations & Deployment | ~45% |
-| **Bhoomi Purushwani** | Frontend Lead (Student Portal) | Vite/React Scaffold, Responsive Layouts, Navbar/Sidebar Navigation, Student Portal UI (Dashboard, Profile, Fees, Complaints, Leave, Notices) | ~18% |
-| **Anushka Upadhyay** | Frontend Developer (Admin/Warden) | Authentication UI (Login/Register), Admin & Warden Operational Dashboards, Student Data Table, Room Allocation UI, Complaint Triage UI | ~18% |
+| **Anushka Upadhyay** | Frontend Lead (Student Portal) | Vite/React Scaffold, Responsive Layouts, Navbar/Sidebar Navigation, Student Portal UI (Dashboard, Profile, Fees, Complaints, Leave, Notices) | ~18% |
+| **Bhoomi Purushwani** | Frontend Developer (Admin/Warden) | Authentication UI (Login/Register), Admin & Warden Operational Dashboards, Student Data Table, Room Allocation UI, Complaint Triage UI | ~18% |
 | **Palak Saraswat** | Operational Modules, QA & Docs | Project Documentation (`docs/`), Attendance Module UI, Leave Approval Desk UI, Visitor Registry UI, Postman API Testing & User Manual | ~19% |
 
 ---
 
 ## 📌 Ownership Matrix by Module
 
-| Module / Area | Ayush (Backend/Architect) | Bhoomi (Student FE) | Anushka (Admin FE) | Palak (Ops/Docs/QA) |
+| Module / Area | Ayush (Backend/Architect) | Anushka (Student FE) | Bhoomi (Admin FE) | Palak (Ops/Docs/QA) |
 | :--- | :--- | :--- | :--- | :--- |
 | **System Architecture & Config** | 👑 Owner | Consumer | Consumer | Documentation |
 | **Database Schemas & Models** | 👑 Owner | - | - | Documentation |
@@ -40,6 +40,6 @@
 To avoid Git merge conflicts and maintain clear contribution histories for evaluation:
 
 - **Ayush:** Branch `feature/ayush-backend` -> Commits related to `server/`, DB models, APIs, security.
-- **Bhoomi:** Branch `feature/bhoomi-student` -> Commits related to `client/src/layouts/`, `client/src/pages/student/`, base frontend setup.
-- **Anushka:** Branch `feature/anushka-admin` -> Commits related to `client/src/pages/auth/`, `client/src/pages/admin/`.
+- **Anushka:** Branch `feature/anushka-student` -> Commits related to `client/src/layouts/`, `client/src/pages/student/`, base frontend setup.
+- **Bhoomi:** Branch `feature/bhoomi-admin` -> Commits related to `client/src/pages/auth/`, `client/src/pages/admin/`.
 - **Palak:** Branch `feature/palak-ops-docs` -> Commits related to `docs/`, `client/src/pages/warden/`, `phase_1_complete.md`.

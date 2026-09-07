@@ -86,8 +86,8 @@ git commit -m "docs(palak): add phase 2 completion report and schema mapping doc
 
 ---
 
-### 3. 🎨 BHOOMI PURUSHWANI & 🔐 ANUSHKA UPADHYAY
-**Branch Names:** `feature/bhoomi-student` & `feature/anushka-admin`
+### 3. 🎨 ANUSHKA UPADHYAY & 🔐 BHOOMI PURUSHWANI
+**Branch Names:** `feature/anushka-student` & `feature/bhoomi-admin`
 
 #### Responsibilities:
 - Review `server/models/User.js` and `server/models/Student.js` field requirements to ensure frontend forms in Phase 3 & 4 match backend validation schemas.
