@@ -8,7 +8,7 @@
 
 ## 📌 Phase 4 Deliverables Overview
 
-### 1. Work Completion
+### 1. New updated Work Distribution 
 
 
 1. **AYUSH :**
