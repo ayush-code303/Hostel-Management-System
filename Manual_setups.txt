@@ -1,0 +1,344 @@
+================================================================================
+    SHARDA UNIVERSITY AGRA - HOSTEL MANAGEMENT SYSTEM (HMS)
+         BEGINNER'S MASTER MANUAL SETUP GUIDE (Manual_setup.txt)
+================================================================================
+This document contains the COMPLETE, step-by-step guidance for all external 
+services, accounts, API keys, and environment configurations that CAN ONLY BE 
+SET UP MANUALLY BY YOU (the project owner).
+
+You do NOT need any prior cloud experience. Follow each step in order.
+All services listed below are 100% FREE (Free Tier / Test Sandbox). No credit 
+card or payment is required.
+
+================================================================================
+TABLE OF CONTENTS:
+================================================================================
+1. PREREQUISITES CHECK (Node.js & Local Environment)
+2. MONGODB ATLAS CLOUD DATABASE SETUP (100% Free M0 Cluster)
+3. RAZORPAY TEST MODE PAYMENT GATEWAY SETUP (Hostel Fee Simulation)
+4. CLOUDINARY CLOUD STORAGE SETUP (Student Photos & Document Uploads)
+5. GOOGLE GMAIL APP PASSWORD SETUP (Email Alerts & Gate Pass Receipts)
+6. POSTMAN DESKTOP SETUP & RUNNING AUTOMATED API TEST SUITE
+7. CONFIGURING YOUR LOCAL .ENV FILES (Server & Client Copy-Paste)
+8. POPULATING DEMO DATA (Database Seeder Command)
+9. FREE CLOUD DEPLOYMENT GUIDE (Vercel Frontend + Render Backend)
+10. BEGINNER TROUBLESHOOTING & FAQ
+================================================================================
+
+
+--------------------------------------------------------------------------------
+1. PREREQUISITES CHECK (YOUR LAPTOP / PC)
+--------------------------------------------------------------------------------
+Before setting up accounts, verify that your machine has Node.js installed:
+
+Step 1.1: Open PowerShell or Command Prompt on your computer.
+Step 1.2: Type:
+   node -v
+   npm -v
+
+If it displays versions like `v20.x.x` or `v18.x.x`, you are good to go!
+If it says "node is not recognized", download the LTS (Long Term Support) 
+version from the official website:
+👉 Download Link: https://nodejs.org/en/download
+Install it with default settings, then restart PowerShell.
+
+
+--------------------------------------------------------------------------------
+2. MONGODB ATLAS CLOUD DATABASE SETUP (FREE M0 TIER)
+--------------------------------------------------------------------------------
+MongoDB Atlas is the cloud database where all your university data (students, 
+rooms, attendance, leaves, complaints) will be stored securely online.
+
+Step 2.1: Create Free Account
+- Go to: https://www.mongodb.com/cloud/atlas/register
+- Click "Sign up with Google" or enter your email and choose a password.
+
+Step 2.2: Create Free Database Cluster
+- After logging in, you will see a screen asking "Deploy a cloud database".
+- Select the tier: "M0 Free" (Shared, 512 MB Storage, $0/month).
+- Provider: Select "AWS".
+- Region: Choose the region nearest to you (e.g., "ap-south-1 Mumbai" or "eu-central-1").
+- Cluster Name: Keep it as `Cluster0` (or name it `sharda-hostel-cluster`).
+- Click the green button: "Create Deployment".
+
+Step 2.3: Create Database User Credentials (IMPORTANT!)
+- A security pop-up ("Quick Start") will appear.
+- Username: Type `ayush_admin` (or any username you prefer).
+- Password: Click "Autogenerate Secure Password" OR create your own password 
+  (Example: `ShardaHostel2026!`).
+⚠️ NOTE: WRITE DOWN OR COPY THIS USERNAME AND PASSWORD RIGHT NOW! 
+You will need them in the connection string.
+- Click "Create Database User".
+
+Step 2.4: Whitelist IP Address (Allow Connection From Anywhere)
+- Scroll down to "Where would you like to connect from?".
+- Click "IP Access List".
+- Enter IP Address: `0.0.0.0/0`
+- Description: `Allow all connections (Localhost & Render)`
+- Click "Add Entry".
+(This allows your laptop at home, college Wi-Fi, and your hosted cloud server 
+to reach the database without being blocked).
+
+Step 2.5: Get the MongoDB Connection String URI
+- Click "Choose a connection method" (or click "Connect" on the cluster card).
+- Select: "Drivers".
+- Driver: Choose "Node.js", Version: "5.5 or later".
+- You will see a connection string like this:
+  mongodb+srv://ayush_admin:<password>@cluster0.abc12.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0
+
+Step 2.6: Prepare Your Connection String
+1. Replace `<password>` with the actual password you created in Step 2.3 (remove the `< >` brackets).
+2. Right before the `?retryWrites=true`, add the database name: `hostel_management_db`.
+Your final URI will look like:
+mongodb+srv://ayush_admin:ShardaHostel2026!@cluster0.abc12.mongodb.net/hostel_management_db?retryWrites=true&w=majority
+
+Copy this prepared URI. You will paste it into `server/.env` under `MONGO_URI`.
+
+
+--------------------------------------------------------------------------------
+3. RAZORPAY TEST MODE PAYMENT GATEWAY SETUP (HOSTEL FEE SIMULATION)
+--------------------------------------------------------------------------------
+Razorpay allows students to pay their hostel fee (₹45,000) online via UPI, 
+Cards, or NetBanking. In "Test Mode", you can simulate payments without 
+spending any real money!
+
+Step 3.1: Create Free Razorpay Account
+- Go to: https://dashboard.razorpay.com/signup
+- Sign up using your email or Google account.
+- When asked "What type of business are you?", select "Individual / Freelancer / Student Project".
+- Note: You DO NOT need to complete KYC, bank verification, or upload GST documents!
+
+Step 3.2: Switch to Test Mode
+- Look at the top right (or top left) of your Razorpay Dashboard header.
+- You will see a toggle: [ Live Mode | Test Mode ].
+- Make sure it is switched to "TEST MODE" (it will display a yellow banner "Test Mode").
+
+Step 3.3: Generate Test API Keys
+- In the left sidebar navigation, click: "Account & Settings" (or "Settings").
+- Under "Website and app settings", click: "API Keys".
+- Click the blue button: "Generate Test Key".
+- A modal popup will display two keys:
+  1. Key ID: (Starts with `rzp_test_...` e.g., `rzp_test_9X1A2bC3dE4fGh`)
+  2. Key Secret: (A random 24-character string e.g., `mK7vL2pQ9wR4tY6uI8oP0aS1`)
+- Click "Download Key Details" or copy both keys to your notepad.
+⚠️ WARNING: The Key Secret is only shown ONCE. If you lose it, you will have to click "Regenerate Key".
+
+Step 3.4: How to Test Payments in the Website (Dummy Credentials)
+During your teacher presentation or testing:
+- Card Number: `4111 1111 1111 1111` (Standard international test Visa card)
+- Expiry Date: Any future month/year (e.g., `12/28`)
+- CVV: `123`
+- OTP: `1234` or click "Success" in the Razorpay sandbox prompt.
+
+
+--------------------------------------------------------------------------------
+4. CLOUDINARY CLOUD STORAGE SETUP (STUDENT PHOTOS & AVATARS)
+--------------------------------------------------------------------------------
+Cloudinary provides free image and PDF hosting so students and wardens can 
+upload profile photos, room maintenance damage pictures, and medical receipts.
+
+Step 4.1: Create Free Cloudinary Account
+- Go to: https://cloudinary.com/users/register_free
+- Sign up with your name and email.
+
+Step 4.2: Locate Your Cloudinary API Credentials
+- Once logged in, you will be on the main "Dashboard" (or "Console Home").
+- Under the "Product Environment Credentials" box, you will find:
+  1. Cloud Name: (e.g., `dxy7z9abc`)
+  2. API Key:    (e.g., `123456789012345`)
+  3. API Secret: (Click the eye icon to reveal, e.g., `abcdef1234567890ABCDEF12345`)
+- Copy all three values. You will paste them into `server/.env`.
+
+
+--------------------------------------------------------------------------------
+5. GOOGLE GMAIL APP PASSWORD SETUP (EMAIL ALERTS & GATE PASSES)
+--------------------------------------------------------------------------------
+This allows the backend to automatically send email notifications to students 
+when their outstation leave pass is approved or when their room complaint is resolved.
+
+Step 5.1: Open Google Security Settings
+- Go to: https://myaccount.google.com/security
+- Make sure "2-Step Verification" is turned ON for your Google account.
+
+Step 5.2: Create an App Password
+- In the search box at the top of your Google Account page, type: "App Passwords".
+- Click on "App Passwords".
+- App Name: Type `Hostel Management System`.
+- Click "Create".
+- A 16-character code will appear (e.g., `abcd efgh ijkl mnop`).
+- Copy this 16-character code (without spaces).
+- Put your Gmail address in `EMAIL_USER` and this 16-character code in `EMAIL_PASS`.
+
+
+--------------------------------------------------------------------------------
+6. POSTMAN DESKTOP SETUP & RUNNING AUTOMATED API TEST SUITE
+--------------------------------------------------------------------------------
+Palak Saraswat's QA deliverable is the complete automated API test suite 
+located at: `docs/Hostel_Management_API.postman_collection.json`.
+
+Step 6.1: Download Postman
+- Download free Postman app: https://www.postman.com/downloads/
+- Install and launch Postman.
+
+Step 6.2: Import the Collection
+- In Postman, click the "Import" button (top left).
+- Drag and drop or browse to:
+  `E:\MY PROJECT\HOSTEL MANAGEMENT SYSTEM\Hostel-Management-System\docs\Hostel_Management_API.postman_collection.json`
+- Click "Import".
+
+Step 6.3: Run the Automated Tests (Teacher Evaluation Demo!)
+- In the left sidebar of Postman, hover over "Sharda University Agra - Hostel Management API".
+- Click the three dots `...` next to the collection name.
+- Click "Run Collection".
+- Click the blue "Run Sharda University Agra..." button.
+- Postman will execute all 10 endpoint tests (Auth, Students, Hostels, Rooms, 
+  Attendance, Leave Passes, Visitor Registry, Complaints) and display:
+  ✅ 100% PASSED (All tests green!)
+Show this screen to your teacher to prove professional industry-grade QA testing!
+
+
+--------------------------------------------------------------------------------
+7. CONFIGURING YOUR LOCAL .ENV FILES (COPY-PASTE READY)
+--------------------------------------------------------------------------------
+
+### File A: `server/.env`
+Location: `E:\MY PROJECT\HOSTEL MANAGEMENT SYSTEM\Hostel-Management-System\server\.env`
+(Create this file if it doesn't already exist):
+
+```env
+PORT=5000
+NODE_ENV=development
+CLIENT_URL=http://localhost:5173
+
+# 1. MongoDB Connection String (From Section 2)
+# If using Cloud Atlas:
+MONGO_URI=mongodb+srv://ayush_admin:YOUR_PASSWORD@cluster0.abc12.mongodb.net/hostel_management_db?retryWrites=true&w=majority
+# OR If using local MongoDB on your PC:
+# MONGO_URI=mongodb://localhost:27017/hostel_management_db
+
+# 2. JWT Secret Key (Any random secure text)
+JWT_SECRET=sharda_university_agra_super_secret_jwt_key_2026
+JWT_EXPIRE=24h
+
+# 3. Razorpay Test Credentials (From Section 3)
+RAZORPAY_KEY_ID=rzp_test_YOUR_KEY_ID
+RAZORPAY_KEY_SECRET=YOUR_KEY_SECRET
+
+# 4. Cloudinary Storage (From Section 4)
+CLOUDINARY_CLOUD_NAME=YOUR_CLOUD_NAME
+CLOUDINARY_API_KEY=YOUR_API_KEY
+CLOUDINARY_API_SECRET=YOUR_API_SECRET
+
+# 5. Email Notification (From Section 5 - Optional)
+EMAIL_SERVICE=gmail
+EMAIL_USER=your_email@gmail.com
+EMAIL_PASS=your_16_character_app_password
+```
+
+---
+
+### File B: `client/.env`
+Location: `E:\MY PROJECT\HOSTEL MANAGEMENT SYSTEM\Hostel-Management-System\client\.env`
+(Create this file if it doesn't already exist):
+
+```env
+# Backend API Base URL
+VITE_API_URL=http://localhost:5000/api
+
+# Razorpay Client Key ID (From Section 3 - Safe for browser)
+VITE_RAZORPAY_KEY_ID=rzp_test_YOUR_KEY_ID
+
+# University Information
+VITE_UNIVERSITY_NAME="Sharda University Agra"
+VITE_CAMPUS_LOCATION="Agra, Uttar Pradesh"
+```
+
+
+--------------------------------------------------------------------------------
+8. POPULATING DEMO DATA (DATABASE SEEDER)
+--------------------------------------------------------------------------------
+Once your MongoDB connection string is saved in `server/.env`, execute the seeder:
+
+Step 8.1: Open PowerShell and run:
+```powershell
+cd "E:\MY PROJECT\HOSTEL MANAGEMENT SYSTEM\Hostel-Management-System\server"
+npm run seed
+```
+
+This will automatically create:
+- Student Ayush (`25ASETCSE019`) allocated to Mandela Boys Hostel Room 204.
+- Nelson Mandela Boys Hostel, Tagore Boys Hostel, Sarojini Naidu Girls Hostel.
+- Paid ₹45,000 fee record with receipt ID `TXN-SUA-2026-89412`.
+- 14 days of night curfew attendance records (94.2% attendance rate).
+- Active approved outstation leave pass (`PASS-SUA-2026-019`).
+- Maintenance complaint for Room 204.
+- Campus visitor record.
+
+Demo Credentials:
+- Student Login: `ayush@sharda.ac.in`   / `ayush123`
+- Warden Login:  `warden@sharda.ac.in`  / `warden123`
+- Admin Login:   `admin@sharda.ac.in`   / `admin123`
+
+
+--------------------------------------------------------------------------------
+9. FREE CLOUD DEPLOYMENT GUIDE (WHEN READY TO GO LIVE)
+--------------------------------------------------------------------------------
+When you want to share your project link with your teacher or on LinkedIn:
+
+### Part A: Deploy Backend Server to Render (Free)
+1. Push your project code to GitHub.
+2. Sign up at https://render.com/ (using GitHub login).
+3. Click "New +" -> "Web Service".
+4. Select your GitHub repository.
+5. Root Directory: `server`
+6. Build Command: `npm install`
+7. Start Command: `node server.js`
+8. Under "Environment Variables", add:
+   - `MONGO_URI` (your MongoDB Atlas connection string)
+   - `JWT_SECRET` (`sharda_university_agra_super_secret_jwt_key_2026`)
+   - `NODE_ENV` (`production`)
+   - `CLIENT_URL` (your upcoming Vercel URL)
+9. Click "Create Web Service". Render will give you a live URL:
+   `https://hostel-management-server.onrender.com`
+
+---
+
+### Part B: Deploy Frontend Client to Vercel (Free)
+1. Sign up at https://vercel.com/ (using GitHub login).
+2. Click "Add New..." -> "Project".
+3. Select your repository.
+4. Framework Preset: "Vite".
+5. Root Directory: Click Edit and select `client`.
+6. Environment Variables:
+   - Name: `VITE_API_URL`
+   - Value: `https://hostel-management-server.onrender.com/api`
+7. Click "Deploy". In 60 seconds, Vercel will give you a live website:
+   `https://sharda-hostel-portal.vercel.app`
+
+
+--------------------------------------------------------------------------------
+10. BEGINNER TROUBLESHOOTING & FAQ
+--------------------------------------------------------------------------------
+
+Q1: "MongooseServerSelectionError: connect ECONNREFUSED"
+-> Cause: MongoDB is not reachable.
+-> Fix: In MongoDB Atlas, go to "Network Access" and ensure `0.0.0.0/0` is added to 
+   the IP whitelist. Also check that your database username and password in `server/.env` 
+   do not have typos.
+
+Q2: "Port 5000 is already in use"
+-> Fix: Change `PORT=5001` in `server/.env` and update `VITE_API_URL=http://localhost:5001/api` 
+   in `client/.env`.
+
+Q3: "CORS error in browser console"
+-> Fix: Ensure `server/.env` has `CLIENT_URL=http://localhost:5173`. If using a 
+   different frontend port, update `CLIENT_URL` to match it.
+
+Q4: "Can I run the project without MongoDB Atlas internet connection?"
+-> Yes! If you install MongoDB Community Server locally on your laptop, you can 
+   use `MONGO_URI=mongodb://localhost:27017/hostel_management_db` in `server/.env`.
+   The frontend also has complete mock fallback data built-in!
+
+================================================================================
+           End of Manual_setup.txt - Prepared for Ayush & Team
+================================================================================
