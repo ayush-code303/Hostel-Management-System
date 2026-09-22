@@ -107,7 +107,7 @@ Follow these direct copy-paste commands to launch both the backend server and fr
 
 #### Terminal 1: Start Backend API Server
 ```powershell
-cd "E:\MY PROJECT\HOSTEL MANAGEMENT SYSTEM\Hostel-Management-System\server"
+cd server
 npm start
 ```
 *Expected Output:*  
@@ -116,7 +116,7 @@ npm start
 
 #### Terminal 2: Start Frontend Web Application
 ```powershell
-cd "E:\MY PROJECT\HOSTEL MANAGEMENT SYSTEM\Hostel-Management-System\client"
+cd client
 npm run dev
 ```
 *Expected Output:*  

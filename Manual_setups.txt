@@ -65,7 +65,7 @@ Step 2.3: Create Database User Credentials (IMPORTANT!)
 - A security pop-up ("Quick Start") will appear.
 - Username: Type `ayush_admin` (or any username you prefer).
 - Password: Click "Autogenerate Secure Password" OR create your own password 
-  (Example: `ShardaHostel2026!`).
+   (Example: use a strong unique password stored only in your password manager.)
 ⚠️ NOTE: WRITE DOWN OR COPY THIS USERNAME AND PASSWORD RIGHT NOW! 
 You will need them in the connection string.
 - Click "Create Database User".
@@ -90,7 +90,7 @@ Step 2.6: Prepare Your Connection String
 1. Replace `<password>` with the actual password you created in Step 2.3 (remove the `< >` brackets).
 2. Right before the `?retryWrites=true`, add the database name: `hostel_management_db`.
 Your final URI will look like:
-mongodb+srv://ayush_admin:ShardaHostel2026!@cluster0.abc12.mongodb.net/hostel_management_db?retryWrites=true&w=majority
+mongodb+srv://ayush_admin:YOUR_PASSWORD@cluster0.abc12.mongodb.net/hostel_management_db?retryWrites=true&w=majority
 
 Copy this prepared URI. You will paste it into `server/.env` under `MONGO_URI`.
 
@@ -183,7 +183,7 @@ Step 6.1: Download Postman
 Step 6.2: Import the Collection
 - In Postman, click the "Import" button (top left).
 - Drag and drop or browse to:
-  `E:\MY PROJECT\HOSTEL MANAGEMENT SYSTEM\Hostel-Management-System\docs\Hostel_Management_API.postman_collection.json`
+   `docs/Hostel_Management_API.postman_collection.json`
 - Click "Import".
 
 Step 6.3: Run the Automated Tests (Teacher Evaluation Demo!)
@@ -202,7 +202,7 @@ Show this screen to your teacher to prove professional industry-grade QA testing
 --------------------------------------------------------------------------------
 
 ### File A: `server/.env`
-Location: `E:\MY PROJECT\HOSTEL MANAGEMENT SYSTEM\Hostel-Management-System\server\.env`
+Location: `server/.env`
 (Create this file if it doesn't already exist):
 
 ```env
@@ -238,7 +238,7 @@ EMAIL_PASS=your_16_character_app_password
 ---
 
 ### File B: `client/.env`
-Location: `E:\MY PROJECT\HOSTEL MANAGEMENT SYSTEM\Hostel-Management-System\client\.env`
+Location: `client/.env`
 (Create this file if it doesn't already exist):
 
 ```env
@@ -261,7 +261,7 @@ Once your MongoDB connection string is saved in `server/.env`, execute the seede
 
 Step 8.1: Open PowerShell and run:
 ```powershell
-cd "E:\MY PROJECT\HOSTEL MANAGEMENT SYSTEM\Hostel-Management-System\server"
+cd server
 npm run seed
 ```
 

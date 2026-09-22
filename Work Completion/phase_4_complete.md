@@ -34,14 +34,14 @@
 ### 2. 📚 Comprehensive Learning & Tutorial Portal (`learning_and_tutorials/`)
 A dedicated learning directory with verified online resources, official documentation, YouTube video courses (English & Hindi), architecture diagrams, phase-by-phase syllabi, and viva prep has been created:
 
-- [`learning_and_tutorials/README.md`](file:///E:/MY%20PROJECT/HOSTEL%20MANAGEMENT%20SYSTEM/Hostel-Management-System/learning_and_tutorials/README.md) — Master parallel learning guide & schedule.
-- **Track 1: Ayush** ([`01_ayush_backend_architecture/`](file:///E:/MY%20PROJECT/HOSTEL%20MANAGEMENT%20SYSTEM/Hostel-Management-System/learning_and_tutorials/01_ayush_backend_architecture/))
+- [`Learning and Tutorials/README.md`](../Learning%20and%20Tutorials/README.md) — Master parallel learning guide & schedule.
+- **Track 1: Ayush** ([`01_ayush-backend_architecture/`](../Learning%20and%20Tutorials/01_ayush-backend_architecture/))
   - Syllabus, Event Loop & JWT guides, freeCodeCamp & Chai aur Code links, 20 Viva Q&As.
-- **Track 2: Anushka** ([`02_anushka_student_frontend/`](file:///E:/MY%20PROJECT/HOSTEL%20MANAGEMENT%20SYSTEM/Hostel-Management-System/learning_and_tutorials/02_anushka_student_frontend/))
+- **Track 2: Anushka** ([`02_anushka-student_frontend/`](../Learning%20and%20Tutorials/02_anushka-student_frontend/))
   - Syllabus, Virtual DOM & Hooks guides, React 18 & Tailwind courses, 20 Viva Q&As.
-- **Track 3: Bhoomi** ([`03_bhoomi_admin_operations/`](file:///E:/MY%20PROJECT/HOSTEL%20MANAGEMENT%20SYSTEM/Hostel-Management-System/learning_and_tutorials/03_bhoomi_admin_operations/))
+- **Track 3: Bhoomi** ([`03_bhoomi-admin_operations/`](../Learning%20and%20Tutorials/03_bhoomi-admin_operations/))
   - Syllabus, Admin architecture & Axios guides, Table filtering tutorials, 20 Viva Q&As.
-- **Track 4: Palak** ([`04_palak_ops_security_qa/`](file:///E:/MY%20PROJECT/HOSTEL%20MANAGEMENT%20SYSTEM/Hostel-Management-System/learning_and_tutorials/04_palak_ops_security_qa/))
+- **Track 4: Palak** ([`04_palak-ops_security_qa/`](../Learning%20and%20Tutorials/04_palak-ops_security_qa/))
   - Syllabus, State machines & Postman guides, Automated testing courses, 20 Viva Q&As.
 
 ---
@@ -69,7 +69,7 @@ Mounted complete RESTful route controllers in `server/server.js`:
 ### Step 1: Populate Realistic Sharda University Agra Sample Data
 Run the newly created database seeder script:
 ```powershell
-cd "E:\MY PROJECT\HOSTEL MANAGEMENT SYSTEM\Hostel-Management-System\server"
+cd server
 npm run seed
 ```
 
@@ -87,14 +87,14 @@ npm run seed
 
 ### Step 2: Start the Backend API Server (Terminal 1)
 ```powershell
-cd "E:\MY PROJECT\HOSTEL MANAGEMENT SYSTEM\Hostel-Management-System\server"
+cd server
 npm start
 ```
 *Verification:* Open `http://localhost:5000/api/health` in your browser.
 
 ### Step 3: Start the Frontend Client (Terminal 2)
 ```powershell
-cd "E:\MY PROJECT\HOSTEL MANAGEMENT SYSTEM\Hostel-Management-System\client"
+cd client
 npm run dev
 ```
 *Access Web App:* Open `http://localhost:5173/` in your browser.

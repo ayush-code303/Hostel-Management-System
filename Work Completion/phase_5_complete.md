@@ -22,7 +22,7 @@ Created the centralized Axios client service configured with:
 Created global authentication state management:
 - `user`, `token`, `loading`, `login(email, password)`, `logout()`
 - Stored in browser `localStorage` (`sharda_token` and `sharda_user`).
-- Updated [`client/src/pages/auth/Login.jsx`](file:///E:/MY%20PROJECT/HOSTEL%20MANAGEMENT%20SYSTEM/Hostel-Management-System/client/src/pages/auth/Login.jsx) with:
+- Updated [`client/src/pages/auth/Login.jsx`](../client/src/pages/auth/Login.jsx) with:
   - Role buttons (Student / Warden / Admin) that automatically pre-fill demo credentials.
   - Live login to Express backend via `authAPI.login`.
   - Seamless offline fallback for fail-safe teacher demonstrations if backend server is not active.
@@ -41,20 +41,20 @@ Created Palak Saraswat's core QA deliverable:
 
 ### Step 1: Populate Database Records
 ```powershell
-cd "E:\MY PROJECT\HOSTEL MANAGEMENT SYSTEM\Hostel-Management-System\server"
+cd server
 npm run seed
 ```
 
 ### Step 2: Start Backend Server (Terminal 1)
 ```powershell
-cd "E:\MY PROJECT\HOSTEL MANAGEMENT SYSTEM\Hostel-Management-System\server"
+cd server
 npm start
 ```
 *Health Check:* `http://localhost:5000/api/health`
 
 ### Step 3: Start Frontend Client (Terminal 2)
 ```powershell
-cd "E:\MY PROJECT\HOSTEL MANAGEMENT SYSTEM\Hostel-Management-System\client"
+cd client
 npm run dev
 ```
 *Web Application:* `http://localhost:5173/`
