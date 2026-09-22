@@ -37,10 +37,10 @@ Rather than having one person do all the technical work while others only watch,
 
 | Member | Learning Track & Folder | Primary Technologies | Key Deliverable in Project |
 | :--- | :--- | :--- | :--- |
-| **Ayush** | [`01_ayush_backend_architecture`](./01_ayush_backend_architecture/) | Node.js, Express.js, MongoDB, Mongoose, JWT, RBAC, Bcrypt | Backend Server Engine, DB Schemas, Auth & Student APIs |
-| **Anushka Upadhyay** | [`02_anushka_student_frontend`](./02_anushka_student_frontend/) | React.js (v18), Vite, Tailwind CSS, Lucide Icons, Router v6 | Public Website, Student Dashboard, Mess Menu, Complaint Modals |
-| **Bhoomi Purushwani** | [`03_bhoomi_admin_operations`](./03_bhoomi_admin_operations/) | React State, Axios, Data Tables, Modal Dialogues, Form QA | Auth Pages (Login/Register), 11-Panel Admin Control Hub |
-| **Palak Saraswat** | [`04_palak_ops_security_qa`](./04_palak_ops_security_qa/) | Postman, Swagger/OpenAPI, State Machines, Date Filters, QA | Full-Stack Attendance, Outstation Leave, Visitor Security Desk |
+| **Ayush** | [`01_ayush-backend_architecture`](./01_ayush-backend_architecture/) | Node.js, Express.js, MongoDB, Mongoose, JWT, RBAC, Bcrypt | Backend Server Engine, DB Schemas, Auth & Student APIs |
+| **Anushka Upadhyay** | [`02_anushka-student_frontend`](./02_anushka-student_frontend/) | React.js (v18), Vite, Tailwind CSS, Lucide Icons, Router v6 | Public Website, Student Dashboard, Mess Menu, Complaint Modals |
+| **Bhoomi Purushwani** | [`03_bhoomi-admin_operations`](./03_bhoomi-admin_operations/) | React State, Axios, Data Tables, Modal Dialogues, Form QA | Auth Pages (Login/Register), 11-Panel Admin Control Hub |
+| **Palak Saraswat** | [`04_palak-ops_security_qa`](./04_palak-ops_security_qa/) | Postman, Swagger/OpenAPI, State Machines, Date Filters, QA | Full-Stack Attendance, Outstation Leave, Visitor Security Desk |
 
 ---
 
