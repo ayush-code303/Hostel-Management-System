@@ -1,4 +1,4 @@
-# ✅ Phase 5 & 6 Completion: Full-Stack Integration, Manual Setup Guide & Automated QA
+# ✅ Phase 5 Completion: Full-Stack Integration
 
 > **Project:** Hostel Management System (PBL College Project - Sharda University Agra)  
 > **Phase Completed:** Phase 5 & Phase 6 (Part 1) - Full-Stack Client-Server Integration, Postman Automated Test Collection, AuthContext & Manual Cloud Setup Guide  
