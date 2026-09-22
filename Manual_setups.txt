@@ -4,7 +4,7 @@
 ================================================================================
 This document contains the COMPLETE, step-by-step guidance for all external 
 services, accounts, API keys, and environment configurations that CAN ONLY BE 
-SET UP MANUALLY BY YOU (the project owner).
+SET UP MANUALLY.
 
 You do NOT need any prior cloud experience. Follow each step in order.
 All services listed below are 100% FREE (Free Tier / Test Sandbox). No credit 
