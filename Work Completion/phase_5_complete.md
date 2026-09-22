@@ -30,7 +30,7 @@ Created global authentication state management:
 ---
 
 ### 3. 🧪 Automated Postman Test Collection (`docs/Hostel_Management_API.postman_collection.json`)
-Created Palak Saraswat's core QA deliverable:
+Created core QA deliverable:
 - Collection contains 10 automated test suites covering all system APIs.
 - Includes automated JavaScript assertions (`pm.test`, `pm.response.to.have.status(200)`).
 - Automatically captures the JWT token upon student login and sets `{{authToken}}` for subsequent requests.
