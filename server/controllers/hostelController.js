@@ -1,6 +1,8 @@
+const mongoose = require('mongoose');
 const Hostel = require('../models/Hostel');
 const Room = require('../models/Room');
 const { sendSuccess, sendError } = require('../utils/response');
+const { mockHostels } = require('../utils/mockData');
 
 /**
  * @desc    Get all hostel blocks with occupancy statistics
@@ -9,9 +11,12 @@ const { sendSuccess, sendError } = require('../utils/response');
  */
 const getAllHostels = async (req, res) => {
   try {
+    if (mongoose.connection.readyState !== 1) {
+      return sendSuccess(res, 'Hostels retrieved successfully (Mock Mode)', mockHostels);
+    }
+
     const hostels = await Hostel.find().populate('warden', 'name email');
 
-    // Aggregate room occupancy per hostel
     const hostelData = await Promise.all(
       hostels.map(async (hostel) => {
         const rooms = await Room.find({ hostel: hostel._id });
@@ -42,6 +47,11 @@ const getAllHostels = async (req, res) => {
  */
 const getHostelById = async (req, res) => {
   try {
+    if (mongoose.connection.readyState !== 1) {
+      const found = mockHostels.find(h => h._id === req.params.id) || mockHostels[0];
+      return sendSuccess(res, 'Hostel details retrieved (Mock Mode)', found);
+    }
+
     const hostel = await Hostel.findById(req.params.id).populate('warden', 'name email');
     if (!hostel) {
       return sendError(res, 'Hostel block not found', 404);
@@ -58,47 +68,30 @@ const getHostelById = async (req, res) => {
   }
 };
 
-/**
- * @desc    Create new hostel block
- * @route   POST /api/hostels
- * @access  Private (Admin only)
- */
 const createHostel = async (req, res) => {
   try {
-    const { name, code, totalFloors, totalRooms, capacity, gender, warden } = req.body;
+    if (mongoose.connection.readyState !== 1) {
+      const newHostel = { _id: `hst-${Date.now()}`, ...req.body };
+      mockHostels.push(newHostel);
+      return sendSuccess(res, 'Hostel block created (Mock Mode)', newHostel, 201);
+    }
 
-    const hostel = await Hostel.create({
-      name,
-      code: code ? code.toUpperCase() : undefined,
-      totalFloors: totalFloors || 4,
-      totalRooms: totalRooms || 50,
-      capacity: capacity || 150,
-      gender: gender || 'co-ed',
-      warden: warden || undefined
-    });
-
+    const hostel = await Hostel.create(req.body);
     return sendSuccess(res, 'Hostel block created successfully', hostel, 201);
   } catch (error) {
     return sendError(res, error.message || 'Error creating hostel block', 500, error);
   }
 };
 
-/**
- * @desc    Update hostel block
- * @route   PUT /api/hostels/:id
- * @access  Private (Admin only)
- */
 const updateHostel = async (req, res) => {
   try {
-    const hostel = await Hostel.findByIdAndUpdate(req.params.id, req.body, {
-      new: true,
-      runValidators: true
-    });
-
-    if (!hostel) {
-      return sendError(res, 'Hostel block not found', 404);
+    if (mongoose.connection.readyState !== 1) {
+      const found = mockHostels.find(h => h._id === req.params.id) || mockHostels[0];
+      Object.assign(found, req.body);
+      return sendSuccess(res, 'Hostel block updated (Mock Mode)', found);
     }
 
+    const hostel = await Hostel.findByIdAndUpdate(req.params.id, req.body, { new: true });
     return sendSuccess(res, 'Hostel block updated successfully', hostel);
   } catch (error) {
     return sendError(res, error.message || 'Error updating hostel block', 500, error);

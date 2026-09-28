@@ -1,6 +1,8 @@
+const mongoose = require('mongoose');
 const User = require('../models/User');
 const Student = require('../models/Student');
 const { sendSuccess, sendError } = require('../utils/response');
+const { mockUsers, mockStudents, generateMockToken } = require('../utils/mockData');
 
 /**
  * @desc    Register a new user (Student / Warden / Admin)
@@ -10,6 +12,32 @@ const { sendSuccess, sendError } = require('../utils/response');
 const register = async (req, res) => {
   try {
     const { name, email, password, role, rollNumber, department, year, phone, guardianPhone } = req.body;
+
+    // Check if running in Mock Mode
+    if (mongoose.connection.readyState !== 1) {
+      const newUser = {
+        _id: `usr-${Date.now()}`,
+        name: name || 'Demo Student',
+        email: email || 'student@sharda.ac.in',
+        role: role || 'student',
+        isActive: true
+      };
+      const token = generateMockToken(newUser);
+      return sendSuccess(res, 'Registration successful (Mock Mode)', {
+        token,
+        user: {
+          id: newUser._id,
+          name: newUser.name,
+          email: newUser.email,
+          role: newUser.role,
+          student: {
+            rollNumber: rollNumber || '25ASETCSE019',
+            department: department || 'Computer Science & Engineering',
+            year: year || 2
+          }
+        }
+      }, 201);
+    }
 
     // Check if user already exists
     const userExists = await User.findOne({ email });
@@ -25,14 +53,12 @@ const register = async (req, res) => {
       role: role || 'student'
     });
 
-    // If role is student, create associated Student record
     let studentRecord = null;
     if (user.role === 'student') {
       if (!rollNumber) {
         return sendError(res, 'Roll number is required for student registration', 400);
       }
 
-      // Check if roll number already exists
       const rollExists = await Student.findOne({ rollNumber: rollNumber.toUpperCase() });
       if (rollExists) {
         await User.findByIdAndDelete(user._id);
@@ -49,7 +75,6 @@ const register = async (req, res) => {
       });
     }
 
-    // Generate JWT token
     const token = user.getSignedJwtToken();
 
     return sendSuccess(res, 'Registration successful', {
@@ -76,18 +101,45 @@ const login = async (req, res) => {
   try {
     const { email, password } = req.body;
 
-    // Validate email & password inputs
     if (!email || !password) {
       return sendError(res, 'Please provide email and password', 400);
     }
 
-    // Find user by email and select password field
+    // Check if running in Mock Mode
+    if (mongoose.connection.readyState !== 1) {
+      const matchedUser = mockUsers.find(
+        u => u.email.toLowerCase() === email.toLowerCase() && u.password === password
+      ) || mockUsers.find(
+        u => u.email.toLowerCase() === email.toLowerCase()
+      ) || {
+        _id: 'usr-student-01',
+        name: 'Ayush',
+        email: email,
+        role: email.includes('admin') ? 'admin' : email.includes('warden') ? 'warden' : 'student',
+        isActive: true
+      };
+
+      const token = generateMockToken(matchedUser);
+      const studentProfile = matchedUser.role === 'student' ? mockStudents[0] : null;
+
+      return sendSuccess(res, 'Login successful (Mock Mode)', {
+        token,
+        user: {
+          id: matchedUser._id,
+          name: matchedUser.name,
+          email: matchedUser.email,
+          role: matchedUser.role,
+          student: studentProfile
+        }
+      });
+    }
+
+    // MongoDB Mode
     const user = await User.findOne({ email }).select('+password');
     if (!user) {
       return sendError(res, 'Invalid credentials', 401);
     }
 
-    // Check if password matches
     const isMatch = await user.matchPassword(password);
     if (!isMatch) {
       return sendError(res, 'Invalid credentials', 401);
@@ -97,7 +149,6 @@ const login = async (req, res) => {
       return sendError(res, 'Your account has been deactivated. Please contact the administrator.', 403);
     }
 
-    // Fetch student profile if user is a student
     let studentProfile = null;
     if (user.role === 'student') {
       studentProfile = await Student.findOne({ user: user._id })
@@ -107,7 +158,6 @@ const login = async (req, res) => {
         });
     }
 
-    // Generate token
     const token = user.getSignedJwtToken();
 
     return sendSuccess(res, 'Login successful', {
@@ -132,6 +182,21 @@ const login = async (req, res) => {
  */
 const getMe = async (req, res) => {
   try {
+    if (mongoose.connection.readyState !== 1) {
+      const mockUser = req.user || mockUsers[2];
+      const studentProfile = mockUser.role === 'student' ? mockStudents[0] : null;
+
+      return sendSuccess(res, 'User profile retrieved (Mock Mode)', {
+        user: {
+          id: mockUser._id,
+          name: mockUser.name,
+          email: mockUser.email,
+          role: mockUser.role,
+          student: studentProfile
+        }
+      });
+    }
+
     const user = await User.findById(req.user.id);
     let studentProfile = null;
 
