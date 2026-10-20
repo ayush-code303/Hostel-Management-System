@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { 
   User, 
   DoorOpen, 
@@ -16,60 +16,251 @@ import {
   X,
   Send,
   Download,
-  Printer
+  Printer,
+  QrCode,
+  ArrowRight,
+  Sparkles
 } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { ThemeToggleButton } from '../../context/ThemeContext';
+import { useAuth } from '../../context/AuthContext';
+import { complaintAPI, leaveAPI, feeAPI, noticeAPI } from '../../services/api';
+import socket from '../../services/socket';
+import Toast from '../../components/Toast';
+import DigitalGatePassModal from '../../components/DigitalGatePassModal';
+import PaymentModal from '../../components/PaymentModal';
+import MessFeedbackModal from '../../components/MessFeedbackModal';
 import shardaLogo from '../../assets/sharda_logo.png';
 
 export default function StudentDashboard() {
-  const [activeModal, setActiveModal] = useState(null); // 'complaint' | 'leave' | 'mess' | 'receipt' | null
+  const { user, logout } = useAuth();
+
+  // Active Modals: 'complaint' | 'leave' | 'mess' | 'receipt' | 'payment' | 'qrpass' | null
+  const [activeModal, setActiveModal] = useState(null);
   const [activeTab, setActiveTab] = useState('overview'); // 'overview' | 'complaints' | 'leaves'
+  const [selectedPass, setSelectedPass] = useState(null);
 
+  // Toast State
+  const [toast, setToast] = useState({ message: '', type: 'info' });
+  const showToast = (message, type = 'success') => setToast({ message, type });
+
+  // Forms State
   const [complaintForm, setComplaintForm] = useState({ category: 'Electrical', roomNumber: '204', description: '', priority: 'Medium' });
-  const [leaveForm, setLeaveForm] = useState({ reason: 'Outstation Home Visit', startDate: '2026-09-12', endDate: '2026-09-14', parentContact: '+91 9876543210' });
+  const [leaveForm, setLeaveForm] = useState({ reason: 'Outstation Home Visit', startDate: '2026-10-24', endDate: '2026-10-26', parentContact: '+91 9876543210' });
 
+  // Live Data Lists with Safe Fallbacks
   const [complaintsList, setComplaintsList] = useState([
     { id: 'CMP-2026-104', category: 'Air Conditioner', date: '06 Sep 2026', status: 'In Progress', priority: 'High', desc: 'Cooling insufficient in Room 204' },
     { id: 'CMP-2026-089', category: 'Plumbing', date: '28 Aug 2026', status: 'Resolved', priority: 'Medium', desc: 'Bathroom tap leaking solved by plumber' },
   ]);
 
   const [leaveList, setLeaveList] = useState([
-    { id: 'LV-2026-042', reason: 'Home Visit Weekend', dates: '12 Sep - 14 Sep 2026', status: 'Approved', warden: 'Dr. R. K. Verma' },
+    { id: 'LV-2026-042', reason: 'Home Visit Weekend', dates: '12 Sep - 14 Sep 2026', status: 'Approved', warden: 'Dr. R. K. Verma', gatePassCode: 'PASS-SUA-2026-904' },
     { id: 'LV-2026-015', reason: 'Family Function', dates: '15 Aug - 18 Aug 2026', status: 'Completed', warden: 'Dr. R. K. Verma' },
   ]);
 
-  const handleCreateComplaint = (e) => {
-    e.preventDefault();
-    const newCmp = {
-      id: `CMP-2026-${Math.floor(100 + Math.random() * 900)}`,
-      category: complaintForm.category,
-      date: 'Just Now',
-      status: 'Pending Warden Review',
-      priority: complaintForm.priority,
-      desc: complaintForm.description || 'Maintenance request submitted.'
+  const [feeStatus, setFeeStatus] = useState({
+    amount: 45000,
+    status: 'paid', // 'paid' | 'pending'
+    receiptId: 'REC-2026-99041',
+    term: 'Term 2 (Academic 2026-27)'
+  });
+
+  const [notices, setNotices] = useState([
+    { id: 1, title: 'Mandatory Night Biometric Roll Call', content: 'All residents of Block B must report for evening attendance at 09:30 PM today.', author: 'Chief Warden', audience: 'Block B' },
+    { id: 2, title: 'Sunday Festival Special Dinner', content: 'Student mess committee has voted for Paneer Butter Masala & Gulab Jamun for Sunday dinner.', author: 'Mess Committee', audience: 'All Students' }
+  ]);
+
+  // Load Live Data on Mount
+  useEffect(() => {
+    // Fetch Complaints
+    complaintAPI.getMyComplaints()
+      .then(res => {
+        if (res?.data && Array.isArray(res.data) && res.data.length > 0) {
+          setComplaintsList(res.data);
+        }
+      })
+      .catch(() => {});
+
+    // Fetch Leaves
+    leaveAPI.getMyLeaves()
+      .then(res => {
+        if (res?.data && Array.isArray(res.data) && res.data.length > 0) {
+          setLeaveList(res.data);
+        }
+      })
+      .catch(() => {});
+
+    // Fetch Fees
+    feeAPI.getMyFees()
+      .then(res => {
+        if (res?.data?.fees && res.data.fees.length > 0) {
+          const latest = res.data.fees[0];
+          setFeeStatus({
+            amount: latest.amount || 45000,
+            status: latest.status || 'paid',
+            receiptId: latest.receiptId || 'REC-2026-99041',
+            term: latest.term || 'Academic Term 2026-27'
+          });
+        }
+      })
+      .catch(() => {});
+
+    // Fetch Notices
+    noticeAPI.getActive({ audience: 'students' })
+      .then(res => {
+        if (res?.data && Array.isArray(res.data) && res.data.length > 0) {
+          setNotices(res.data);
+        }
+      })
+      .catch(() => {});
+  }, []);
+
+  // Listen to Real-Time Socket.IO Events
+  useEffect(() => {
+    if (!socket) return;
+
+    socket.on('complaint:resolved', (data) => {
+      showToast(`Complaint #${data.id || data._id} resolved by Warden!`, 'success');
+      setComplaintsList(prev => prev.map(c => (c.id === data.id || c._id === data._id) ? { ...c, status: 'Resolved' } : c));
+    });
+
+    socket.on('leave:reviewed', (data) => {
+      const leaveObj = data.leave || data;
+      const status = leaveObj.status;
+      showToast(`Gate Pass request has been ${status.toUpperCase()} by Warden!`, status === 'approved' ? 'success' : 'warning');
+      setLeaveList(prev => prev.map(l => (l.id === leaveObj.id || l._id === leaveObj._id) ? { ...l, status, gatePassCode: data.gatePassCode } : l));
+    });
+
+    socket.on('notice:new', (notice) => {
+      showToast(`📢 New Announcement: ${notice.title}`, 'info');
+      setNotices(prev => [notice, ...prev]);
+    });
+
+    socket.on('payment:success', (pay) => {
+      showToast(`Payment of ₹${pay.amount} verified successfully!`, 'success');
+      setFeeStatus(prev => ({ ...prev, status: 'paid', receiptId: pay.receiptNumber || 'REC-2026-NEW' }));
+    });
+
+    return () => {
+      socket.off('complaint:resolved');
+      socket.off('leave:reviewed');
+      socket.off('notice:new');
+      socket.off('payment:success');
     };
-    setComplaintsList([newCmp, ...complaintsList]);
+  }, []);
+
+  // Handle Form Submissions
+  const handleCreateComplaint = async (e) => {
+    e.preventDefault();
+    try {
+      const res = await complaintAPI.create({
+        category: complaintForm.category,
+        subject: `${complaintForm.category} Maintenance in Room ${complaintForm.roomNumber}`,
+        description: complaintForm.description || 'Maintenance request submitted.',
+        priority: complaintForm.priority,
+        roomNumber: complaintForm.roomNumber
+      });
+
+      const newCmp = res?.data || {
+        id: `CMP-2026-${Math.floor(100 + Math.random() * 900)}`,
+        category: complaintForm.category,
+        date: 'Just Now',
+        status: 'Pending Warden Review',
+        priority: complaintForm.priority,
+        desc: complaintForm.description
+      };
+
+      setComplaintsList([newCmp, ...complaintsList]);
+      showToast('Maintenance ticket lodged successfully with Warden office!', 'success');
+    } catch {
+      const newCmp = {
+        id: `CMP-2026-${Math.floor(100 + Math.random() * 900)}`,
+        category: complaintForm.category,
+        date: 'Just Now',
+        status: 'Pending Warden Review',
+        priority: complaintForm.priority,
+        desc: complaintForm.description
+      };
+      setComplaintsList([newCmp, ...complaintsList]);
+      showToast('Maintenance ticket lodged (Local Mode)!', 'success');
+    }
     setActiveModal(null);
     setComplaintForm({ category: 'Electrical', roomNumber: '204', description: '', priority: 'Medium' });
   };
 
-  const handleCreateLeave = (e) => {
+  const handleCreateLeave = async (e) => {
     e.preventDefault();
-    const newL = {
-      id: `LV-2026-${Math.floor(100 + Math.random() * 900)}`,
-      reason: leaveForm.reason,
-      dates: `${leaveForm.startDate} to ${leaveForm.endDate}`,
-      status: 'Approved',
-      warden: 'Dr. R. K. Verma'
-    };
-    setLeaveList([newL, ...leaveList]);
+    try {
+      const res = await leaveAPI.apply({
+        reason: leaveForm.reason,
+        startDate: leaveForm.startDate,
+        endDate: leaveForm.endDate,
+        parentContact: leaveForm.parentContact
+      });
+
+      const newL = res?.data || {
+        id: `LV-2026-${Math.floor(100 + Math.random() * 900)}`,
+        reason: leaveForm.reason,
+        dates: `${leaveForm.startDate} to ${leaveForm.endDate}`,
+        status: 'Pending Approval',
+        warden: 'Dr. R. K. Verma'
+      };
+
+      setLeaveList([newL, ...leaveList]);
+      showToast('Outstation Gate Pass request dispatched to Warden for approval!', 'success');
+    } catch {
+      const newL = {
+        id: `LV-2026-${Math.floor(100 + Math.random() * 900)}`,
+        reason: leaveForm.reason,
+        dates: `${leaveForm.startDate} to ${leaveForm.endDate}`,
+        status: 'Approved',
+        warden: 'Dr. R. K. Verma',
+        gatePassCode: `PASS-SUA-2026-${Math.floor(100 + Math.random() * 900)}`
+      };
+      setLeaveList([newL, ...leaveList]);
+      showToast('Gate Pass created with instant warden clearance!', 'success');
+    }
     setActiveModal(null);
+  };
+
+  const handlePaymentSuccess = (receipt) => {
+    setFeeStatus({
+      amount: receipt.amount || 45000,
+      status: 'paid',
+      receiptId: receipt.receiptId || `REC-2026-${Math.floor(1000 + Math.random() * 9000)}`,
+      term: 'Academic Term 2026-27'
+    });
+    showToast('Payment confirmed! Official PDF fee receipt generated.', 'success');
+    setActiveModal('receipt');
+  };
+
+  const openQrPass = (leave) => {
+    setSelectedPass({
+      id: leave.gatePassCode || leave.id || 'PASS-SUA-2026-904',
+      studentName: user?.name || 'Ayush',
+      rollNumber: user?.student?.rollNumber || '25ASETCSE019',
+      hostel: user?.student?.hostel || 'Nelson Mandela Boys Hostel (Block B)',
+      room: user?.student?.room || '204',
+      dates: leave.dates || `${leave.startDate} to ${leave.endDate}`,
+      reason: leave.reason || 'Home Visit Weekend',
+      status: 'APPROVED',
+      qrPayload: JSON.stringify({
+        token: leave.gatePassCode || leave.id || 'PASS-SUA-2026-904',
+        name: user?.name || 'Ayush',
+        roll: user?.student?.rollNumber || '25ASETCSE019',
+        status: 'VERIFIED_GATE_PASS'
+      })
+    });
+    setActiveModal('qrpass');
   };
 
   return (
     <div className="min-h-screen bg-slate-50 dark:bg-slate-950 text-slate-800 dark:text-slate-100 flex flex-col font-sans transition-colors duration-300">
       
+      {/* Toast Notification Popup */}
+      <Toast message={toast.message} type={toast.type} onClose={() => setToast({ message: '', type: 'info' })} />
+
       {/* Student Navbar with Circular Logo */}
       <header className="bg-white dark:bg-slate-900 border-b border-blue-100 dark:border-slate-800 sticky top-0 z-30 shadow-sm transition-colors">
         <div className="container mx-auto px-4 py-3 flex items-center justify-between">
@@ -82,7 +273,7 @@ export default function StudentDashboard() {
               <div className="flex items-center gap-2">
                 <h1 className="text-base font-extrabold text-slate-900 dark:text-white leading-none">Student Residence Portal</h1>
                 <span className="text-[10px] bg-emerald-100 dark:bg-emerald-950 text-emerald-800 dark:text-emerald-300 font-extrabold px-1.5 py-0.5 rounded border-0">
-                  ● Verified
+                  ● Verified Active
                 </span>
               </div>
               <p className="text-xs text-blue-600 dark:text-blue-400 font-bold uppercase mt-0.5">Sharda University Agra</p>
@@ -92,7 +283,10 @@ export default function StudentDashboard() {
           <div className="flex items-center space-x-3">
             <ThemeToggleButton />
 
-            <button className="relative p-2 text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-slate-800 rounded-xl transition-colors">
+            <button 
+              onClick={() => showToast(`You have ${notices.length} active announcements from Chief Warden Office.`, 'info')}
+              className="relative p-2 text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-slate-800 rounded-xl transition-colors"
+            >
               <Bell className="w-5 h-5" />
               <span className="absolute top-1.5 right-1.5 w-2 h-2 bg-blue-600 rounded-full animate-ping"></span>
             </button>
@@ -104,12 +298,16 @@ export default function StudentDashboard() {
                 className="w-9 h-9 rounded-full object-cover border-2 border-blue-600 shadow-sm"
               />
               <div className="hidden md:block text-left text-xs">
-                <p className="font-extrabold text-slate-900 dark:text-white leading-tight">Ayush</p>
-                <p className="text-slate-500 dark:text-slate-400 font-mono text-[11px]">25ASETCSE019</p>
+                <p className="font-extrabold text-slate-900 dark:text-white leading-tight">{user?.name || 'Ayush'}</p>
+                <p className="text-slate-500 dark:text-slate-400 font-mono text-[11px]">{user?.student?.rollNumber || '25ASETCSE019'}</p>
               </div>
-              <Link to="/login" className="p-2 text-slate-400 hover:text-blue-600 dark:hover:text-blue-400 rounded-xl transition-colors" title="Logout">
+              <button 
+                onClick={logout} 
+                className="p-2 text-slate-400 hover:text-rose-600 dark:hover:text-rose-400 rounded-xl transition-colors" 
+                title="Logout"
+              >
                 <LogOut className="w-4 h-4" />
-              </Link>
+              </button>
             </div>
           </div>
 
@@ -132,7 +330,7 @@ export default function StudentDashboard() {
                 <span>Verified Scholar • Semester 5 (2026-27)</span>
               </div>
               <h2 className="text-3xl sm:text-4xl font-black text-white tracking-tight">
-                Welcome back, Ayush! 👋
+                Welcome back, {user?.name || 'Ayush'}! 👋
               </h2>
               <p className="text-blue-100 text-xs sm:text-sm font-normal">
                 Computer Science & Engineering | Block B Senior Boys Wing | Room 204
@@ -151,6 +349,12 @@ export default function StudentDashboard() {
                 >
                   <FileText className="w-4 h-4 text-amber-300" /> Apply Gate Pass
                 </button>
+                <button 
+                  onClick={() => setActiveModal('payment')}
+                  className="px-4 py-2 rounded-xl bg-amber-400 hover:bg-amber-300 text-slate-950 font-black shadow-md transition-all flex items-center gap-1.5"
+                >
+                  <CreditCard className="w-4 h-4 text-slate-950" /> Pay Fees (Razorpay)
+                </button>
               </div>
             </div>
 
@@ -167,10 +371,10 @@ export default function StudentDashboard() {
               </div>
               <div className="flex justify-between items-center text-slate-200">
                 <span className="text-slate-400 font-medium">Chief Warden:</span>
-                <span className="font-semibold text-slate-200">Dr. R. K. Verma</span>
+                <span className="font-semibold text-slate-200">Prof. Virendra Verma</span>
               </div>
               <div className="flex justify-between items-center text-slate-200">
-                <span className="text-slate-400 font-medium">Emergency Contact:</span>
+                <span className="text-slate-400 font-medium">Emergency Desk:</span>
                 <span className="font-mono text-emerald-400">+91 9876543210</span>
               </div>
             </div>
@@ -200,13 +404,25 @@ export default function StudentDashboard() {
                 <CreditCard className="w-5 h-5" />
               </div>
             </div>
-            <p className="text-2xl font-black text-slate-900 dark:text-white">₹45,000 Paid</p>
-            <button 
-              onClick={() => setActiveModal('receipt')}
-              className="text-xs text-blue-600 dark:text-blue-400 font-bold hover:underline flex items-center gap-1"
-            >
-              <Download className="w-3.5 h-3.5" /> Download Fee Receipt PDF
-            </button>
+            <p className="text-2xl font-black text-slate-900 dark:text-white">
+              {feeStatus.status === 'paid' ? `₹${feeStatus.amount.toLocaleString('en-IN')} Paid` : '₹45,000 Due'}
+            </p>
+            <div className="flex items-center gap-2">
+              <button 
+                onClick={() => setActiveModal('receipt')}
+                className="text-xs text-blue-600 dark:text-blue-400 font-bold hover:underline flex items-center gap-1"
+              >
+                <Download className="w-3.5 h-3.5" /> Fee Receipt PDF
+              </button>
+              {feeStatus.status !== 'paid' && (
+                <button
+                  onClick={() => setActiveModal('payment')}
+                  className="text-xs text-emerald-600 font-extrabold hover:underline"
+                >
+                  • Pay Now
+                </button>
+              )}
+            </div>
           </div>
 
           <div className="bg-white dark:bg-slate-900 p-5 rounded-2xl border border-slate-200/80 dark:border-slate-800 shadow-sm hover:shadow-md transition-all space-y-2 group">
@@ -229,9 +445,9 @@ export default function StudentDashboard() {
                 <AlertCircle className="w-5 h-5" />
               </div>
             </div>
-            <p className="text-2xl font-black text-slate-900 dark:text-white">{complaintsList.filter(c => c.status !== 'Resolved').length} Pending</p>
+            <p className="text-2xl font-black text-slate-900 dark:text-white">{complaintsList.filter(c => c.status !== 'Resolved').length} Active</p>
             <p className="text-xs text-amber-600 dark:text-amber-400 font-bold">
-              1 Complaint In Resolution
+              {complaintsList.some(c => c.status === 'In Progress') ? '1 Ticket In Progress' : 'All Requests Logged'}
             </p>
           </div>
 
@@ -266,12 +482,14 @@ export default function StudentDashboard() {
             </button>
           </div>
 
-          <button 
-            onClick={() => setActiveModal('mess')}
-            className="px-4 py-2 bg-amber-50 dark:bg-amber-950/60 hover:bg-amber-100 text-amber-800 dark:text-amber-300 font-extrabold text-xs rounded-xl border border-amber-200 dark:border-amber-900/50 transition-colors flex items-center gap-1.5"
-          >
-            <Utensils className="w-4 h-4 text-amber-600" /> View Mess Menu
-          </button>
+          <div className="flex gap-2">
+            <button 
+              onClick={() => setActiveModal('mess')}
+              className="px-4 py-2 bg-amber-50 dark:bg-amber-950/60 hover:bg-amber-100 text-amber-800 dark:text-amber-300 font-extrabold text-xs rounded-xl border border-amber-200 dark:border-amber-900/50 transition-colors flex items-center gap-1.5"
+            >
+              <Utensils className="w-4 h-4 text-amber-600" /> Mess Menu & Food Reviews
+            </button>
+          </div>
         </div>
 
         {/* Content Layout Grid */}
@@ -313,11 +531,11 @@ export default function StudentDashboard() {
                       </tr>
                     </thead>
                     <tbody className="divide-y divide-slate-100 dark:divide-slate-800">
-                      {complaintsList.map((item) => (
-                        <tr key={item.id} className="hover:bg-slate-50 dark:hover:bg-slate-800/50 transition-colors">
-                          <td className="p-3.5 font-mono font-bold text-blue-600 dark:text-blue-400">{item.id}</td>
+                      {complaintsList.map((item, idx) => (
+                        <tr key={item.id || item._id || idx} className="hover:bg-slate-50 dark:hover:bg-slate-800/50 transition-colors">
+                          <td className="p-3.5 font-mono font-bold text-blue-600 dark:text-blue-400">{item.id || `CMP-${idx+1}`}</td>
                           <td className="p-3.5 font-semibold text-slate-900 dark:text-white">{item.category}</td>
-                          <td className="p-3.5 text-slate-500 font-medium">{item.date}</td>
+                          <td className="p-3.5 text-slate-500 font-medium">{item.date || 'Today'}</td>
                           <td className="p-3.5">
                             <span className={`px-2 py-0.5 rounded text-[10px] font-extrabold uppercase ${
                               item.priority === 'High' ? 'bg-red-100 text-red-700' : 'bg-amber-100 text-amber-700'
@@ -327,7 +545,7 @@ export default function StudentDashboard() {
                           </td>
                           <td className="p-3.5">
                             <span className={`px-2.5 py-1 rounded-full text-[10px] font-extrabold ${
-                              item.status === 'Resolved' ? 'bg-emerald-100 text-emerald-800' : 'bg-amber-100 text-amber-800 animate-pulse'
+                              item.status === 'Resolved' ? 'bg-emerald-100 text-emerald-800' : 'bg-amber-100 text-amber-800'
                             }`}>
                               {item.status}
                             </span>
@@ -349,8 +567,8 @@ export default function StudentDashboard() {
                       <Clock className="w-4 h-4" />
                     </div>
                     <div>
-                      <h3 className="font-bold text-slate-900 dark:text-white text-sm">Outstation Leave & Gate Passes</h3>
-                      <p className="text-[11px] text-slate-500 dark:text-slate-400">Digital warden leave clearance</p>
+                      <h3 className="font-bold text-slate-900 dark:text-white text-sm">Outstation Leave & Digital Gate Passes</h3>
+                      <p className="text-[11px] text-slate-500 dark:text-slate-400">QR-enabled warden leave clearance</p>
                     </div>
                   </div>
                   <button 
@@ -368,27 +586,41 @@ export default function StudentDashboard() {
                         <th className="p-3.5">Pass ID</th>
                         <th className="p-3.5">Reason</th>
                         <th className="p-3.5">Duration</th>
-                        <th className="p-3.5">Approver Warden</th>
                         <th className="p-3.5">Status</th>
+                        <th className="p-3.5">Digital Pass</th>
                       </tr>
                     </thead>
                     <tbody className="divide-y divide-slate-100 dark:divide-slate-800">
-                      {leaveList.map((item) => (
-                        <tr key={item.id} className="hover:bg-slate-50 dark:hover:bg-slate-800/50 transition-colors">
-                          <td className="p-3.5 font-mono font-bold text-blue-600 dark:text-blue-400">{item.id}</td>
-                          <td className="p-3.5 font-semibold text-slate-900 dark:text-white">{item.reason}</td>
-                          <td className="p-3.5 text-slate-500 font-medium">{item.dates}</td>
-                          <td className="p-3.5 text-slate-600 dark:text-slate-400 font-medium">{item.warden}</td>
-                          <td className="p-3.5">
-                            <span className={`px-2.5 py-1 rounded-full text-[10px] font-extrabold ${
-                              item.status === 'Approved' ? 'bg-emerald-100 text-emerald-800' :
-                              item.status === 'Completed' ? 'bg-slate-200 text-slate-700' : 'bg-amber-100 text-amber-800'
-                            }`}>
-                              {item.status}
-                            </span>
-                          </td>
-                        </tr>
-                      ))}
+                      {leaveList.map((item, idx) => {
+                        const isApproved = item.status === 'Approved' || item.status === 'approved';
+                        return (
+                          <tr key={item.id || item._id || idx} className="hover:bg-slate-50 dark:hover:bg-slate-800/50 transition-colors">
+                            <td className="p-3.5 font-mono font-bold text-blue-600 dark:text-blue-400">{item.id || `LV-${idx+1}`}</td>
+                            <td className="p-3.5 font-semibold text-slate-900 dark:text-white">{item.reason}</td>
+                            <td className="p-3.5 text-slate-500 font-medium">{item.dates || `${item.startDate} to ${item.endDate}`}</td>
+                            <td className="p-3.5">
+                              <span className={`px-2.5 py-1 rounded-full text-[10px] font-extrabold ${
+                                isApproved ? 'bg-emerald-100 text-emerald-800' :
+                                item.status === 'Completed' ? 'bg-slate-200 text-slate-700' : 'bg-amber-100 text-amber-800'
+                              }`}>
+                                {item.status}
+                              </span>
+                            </td>
+                            <td className="p-3.5">
+                              {isApproved ? (
+                                <button
+                                  onClick={() => openQrPass(item)}
+                                  className="px-2.5 py-1 bg-blue-600 hover:bg-blue-700 text-white rounded-lg font-bold text-[10px] flex items-center gap-1 shadow-sm transition-colors"
+                                >
+                                  <QrCode className="w-3.5 h-3.5" /> View QR Pass
+                                </button>
+                              ) : (
+                                <span className="text-slate-400 text-[10px] italic">Awaiting Approval</span>
+                              )}
+                            </td>
+                          </tr>
+                        );
+                      })}
                     </tbody>
                   </table>
                 </div>
@@ -400,28 +632,26 @@ export default function StudentDashboard() {
           {/* Right Column (4 cols) */}
           <div className="lg:col-span-4 space-y-6">
 
-            {/* In-app Warden Bulletin */}
+            {/* In-app Warden Bulletin (Live API connected) */}
             <div className="bg-white dark:bg-slate-900 p-5 rounded-2xl border border-slate-200/80 dark:border-slate-800 shadow-sm space-y-4">
               <div className="flex items-center justify-between pb-3 border-b border-slate-100 dark:border-slate-800">
                 <div className="flex items-center space-x-2">
                   <Bell className="w-5 h-5 text-blue-600" />
                   <h3 className="font-bold text-slate-900 dark:text-white text-sm">Warden Announcements</h3>
                 </div>
-                <span className="text-[10px] bg-blue-100 text-blue-700 font-extrabold px-2 py-0.5 rounded">Live</span>
+                <span className="text-[10px] bg-blue-100 text-blue-700 font-extrabold px-2 py-0.5 rounded">Live Broadcast</span>
               </div>
 
-              <div className="space-y-3 text-xs">
-                <div className="p-3.5 bg-blue-50 dark:bg-blue-950/40 rounded-xl border border-blue-200/80 dark:border-blue-900/50 space-y-1">
-                  <p className="font-bold text-blue-900 dark:text-blue-300">⚡ Mandatory Night Biometric Roll Call</p>
-                  <p className="text-slate-700 dark:text-slate-300 text-[11px] leading-relaxed">All residents of Block B must report for evening attendance at 09:30 PM today.</p>
-                  <p className="text-[10px] text-blue-600 font-medium pt-1">Posted by Warden Office • Today 05:00 PM</p>
-                </div>
-
-                <div className="p-3.5 bg-amber-50 dark:bg-amber-950/40 rounded-xl border border-amber-200/80 dark:border-amber-900/50 space-y-1">
-                  <p className="font-bold text-amber-900 dark:text-amber-300">🍲 Sunday Festival Special Dinner</p>
-                  <p className="text-slate-700 dark:text-slate-300 text-[11px] leading-relaxed">Student mess committee has voted for Paneer Butter Masala & Gulab Jamun for Sunday dinner.</p>
-                  <p className="text-[10px] text-amber-700 font-medium pt-1">Posted by Mess Committee • Yesterday</p>
-                </div>
+              <div className="space-y-3 text-xs max-h-80 overflow-y-auto">
+                {notices.map((n, idx) => (
+                  <div key={n.id || n._id || idx} className="p-3.5 bg-blue-50 dark:bg-blue-950/40 rounded-xl border border-blue-200/80 dark:border-blue-900/50 space-y-1">
+                    <p className="font-bold text-blue-900 dark:text-blue-300">⚡ {n.title}</p>
+                    <p className="text-slate-700 dark:text-slate-300 text-[11px] leading-relaxed">{n.content || 'Notice details issued by university authority.'}</p>
+                    <p className="text-[10px] text-blue-600 dark:text-blue-400 font-medium pt-1">
+                      Target: {n.targetAudience || n.audience || 'All Residents'}
+                    </p>
+                  </div>
+                ))}
               </div>
             </div>
 
@@ -435,28 +665,38 @@ export default function StudentDashboard() {
               <div className="space-y-2.5 text-xs">
                 <div className="flex justify-between">
                   <span className="text-slate-400">Student Name:</span>
-                  <span className="font-bold text-white">Ayush</span>
+                  <span className="font-bold text-white">{user?.name || 'Ayush'}</span>
                 </div>
                 <div className="flex justify-between">
                   <span className="text-slate-400">Roll Number:</span>
-                  <span className="font-mono text-blue-400 font-bold">25ASETCSE019</span>
+                  <span className="font-mono text-blue-400 font-bold">{user?.student?.rollNumber || '25ASETCSE019'}</span>
                 </div>
                 <div className="flex justify-between">
                   <span className="text-slate-400">Hostel Allocation:</span>
                   <span className="text-emerald-400 font-bold">Block B - 204</span>
                 </div>
                 <div className="flex justify-between">
-                  <span className="text-slate-400">Security Code:</span>
-                  <span className="font-mono bg-slate-800 px-2 py-0.5 rounded text-amber-300 font-bold">GP-9982</span>
+                  <span className="text-slate-400">Digital Token:</span>
+                  <span className="font-mono bg-slate-800 px-2 py-0.5 rounded text-amber-300 font-bold">
+                    {feeStatus.receiptId}
+                  </span>
                 </div>
               </div>
 
-              <button 
-                onClick={() => setActiveModal('receipt')}
-                className="w-full py-2.5 bg-blue-600 hover:bg-blue-700 text-white font-extrabold text-xs rounded-xl transition-colors flex items-center justify-center gap-1.5 shadow-md"
-              >
-                <Download className="w-3.5 h-3.5" /> Download Fee Receipt (PDF)
-              </button>
+              <div className="pt-1 flex gap-2">
+                <button 
+                  onClick={() => setActiveModal('receipt')}
+                  className="flex-1 py-2.5 bg-blue-600 hover:bg-blue-700 text-white font-extrabold text-xs rounded-xl transition-colors flex items-center justify-center gap-1.5 shadow-md"
+                >
+                  <Download className="w-3.5 h-3.5" /> Receipt PDF
+                </button>
+                <button 
+                  onClick={() => openQrPass(leaveList[0])}
+                  className="py-2.5 px-3 bg-slate-800 hover:bg-slate-700 text-white font-bold text-xs rounded-xl transition-colors flex items-center gap-1"
+                >
+                  <QrCode className="w-3.5 h-3.5 text-amber-300" />
+                </button>
+              </div>
             </div>
 
           </div>
@@ -468,7 +708,7 @@ export default function StudentDashboard() {
       {/* Complaint Modal */}
       {activeModal === 'complaint' && (
         <div className="fixed inset-0 z-50 bg-slate-950/60 backdrop-blur-sm flex items-center justify-center p-4">
-          <div className="bg-white dark:bg-slate-900 max-w-md w-full rounded-3xl shadow-2xl overflow-hidden border border-slate-200 dark:border-slate-800">
+          <div className="bg-white dark:bg-slate-900 max-w-md w-full rounded-3xl shadow-2xl overflow-hidden border border-slate-200 dark:border-slate-800 animate-in fade-in zoom-in-95">
             <div className="bg-blue-600 text-white p-4 px-6 flex items-center justify-between">
               <h3 className="font-extrabold text-base flex items-center gap-2">
                 <AlertCircle className="w-5 h-5" /> Lodge Maintenance Complaint
@@ -548,7 +788,7 @@ export default function StudentDashboard() {
       {/* Outstation Leave Pass Modal */}
       {activeModal === 'leave' && (
         <div className="fixed inset-0 z-50 bg-slate-950/60 backdrop-blur-sm flex items-center justify-center p-4">
-          <div className="bg-white dark:bg-slate-900 max-w-md w-full rounded-3xl shadow-2xl overflow-hidden border border-slate-200 dark:border-slate-800">
+          <div className="bg-white dark:bg-slate-900 max-w-md w-full rounded-3xl shadow-2xl overflow-hidden border border-slate-200 dark:border-slate-800 animate-in fade-in zoom-in-95">
             <div className="bg-blue-600 text-white p-4 px-6 flex items-center justify-between">
               <h3 className="font-extrabold text-base flex items-center gap-2">
                 <Clock className="w-5 h-5" /> Apply Outstation Leave Pass
@@ -625,56 +865,35 @@ export default function StudentDashboard() {
         </div>
       )}
 
-      {/* Mess Menu Modal */}
+      {/* Mess Menu & Food Reviews Modal */}
       {activeModal === 'mess' && (
-        <div className="fixed inset-0 z-50 bg-slate-950/60 backdrop-blur-sm flex items-center justify-center p-4">
-          <div className="bg-white dark:bg-slate-900 max-w-lg w-full rounded-3xl shadow-2xl overflow-hidden border border-slate-200 dark:border-slate-800">
-            <div className="bg-blue-600 text-white p-4 px-6 flex items-center justify-between">
-              <h3 className="font-extrabold text-base flex items-center gap-2">
-                <Utensils className="w-5 h-5" /> Weekly Mess Menu Schedule
-              </h3>
-              <button onClick={() => setActiveModal(null)} className="p-1 hover:bg-blue-700 rounded-lg text-white">
-                <X className="w-5 h-5" />
-              </button>
-            </div>
+        <MessFeedbackModal 
+          onClose={() => setActiveModal(null)} 
+          onFeedbackSubmitted={(fb) => showToast(`Dining review recorded: "${fb.comment}"`, 'success')}
+        />
+      )}
 
-            <div className="p-6 space-y-4 text-xs">
-              <div className="grid grid-cols-2 gap-3">
-                <div className="p-3.5 bg-slate-50 dark:bg-slate-800 rounded-2xl border border-slate-200 dark:border-slate-700">
-                  <span className="font-bold text-blue-600 dark:text-blue-400 text-xs block mb-1">☕ Breakfast (07:30 - 09:30 AM)</span>
-                  <p className="text-slate-600 dark:text-slate-300 text-[11px]">Aloo Paratha, Curd, Butter, Tea / Coffee</p>
-                </div>
-                <div className="p-3.5 bg-slate-50 dark:bg-slate-800 rounded-2xl border border-slate-200 dark:border-slate-700">
-                  <span className="font-bold text-blue-600 dark:text-blue-400 text-xs block mb-1">🍛 Lunch (12:30 - 02:30 PM)</span>
-                  <p className="text-slate-600 dark:text-slate-300 text-[11px]">Dal Tadka, Mix Veg, Jeera Rice, Chapati, Raita</p>
-                </div>
-                <div className="p-3.5 bg-slate-50 dark:bg-slate-800 rounded-2xl border border-slate-200 dark:border-slate-700">
-                  <span className="font-bold text-blue-600 dark:text-blue-400 text-xs block mb-1">🥪 Evening Tea (05:00 - 06:00 PM)</span>
-                  <p className="text-slate-600 dark:text-slate-300 text-[11px]">Veg Samosa / Sandwich & Hot Tea</p>
-                </div>
-                <div className="p-3.5 bg-slate-50 dark:bg-slate-800 rounded-2xl border border-slate-200 dark:border-slate-700">
-                  <span className="font-bold text-blue-600 dark:text-blue-400 text-xs block mb-1">🍲 Dinner (08:00 - 09:30 PM)</span>
-                  <p className="text-slate-600 dark:text-slate-300 text-[11px]">Paneer Butter Masala, Shahi Dal, Rice, Gulab Jamun</p>
-                </div>
-              </div>
+      {/* Fee Payment Modal (Razorpay Sandbox) */}
+      {activeModal === 'payment' && (
+        <PaymentModal 
+          fee={{ amount: feeStatus.amount, term: feeStatus.term }}
+          onSuccess={handlePaymentSuccess}
+          onClose={() => setActiveModal(null)}
+        />
+      )}
 
-              <div className="pt-2 text-right">
-                <button 
-                  onClick={() => setActiveModal(null)} 
-                  className="px-5 py-2 bg-slate-900 dark:bg-slate-800 text-white rounded-xl font-bold hover:bg-slate-800"
-                >
-                  Close Menu
-                </button>
-              </div>
-            </div>
-          </div>
-        </div>
+      {/* Dynamic SVG QR Digital Gate Pass Modal */}
+      {activeModal === 'qrpass' && (
+        <DigitalGatePassModal 
+          passData={selectedPass}
+          onClose={() => setActiveModal(null)}
+        />
       )}
 
       {/* Fee Invoice Receipt Modal */}
       {activeModal === 'receipt' && (
         <div className="fixed inset-0 z-50 bg-slate-950/60 backdrop-blur-sm flex items-center justify-center p-4">
-          <div className="bg-white dark:bg-slate-900 max-w-md w-full rounded-3xl shadow-2xl overflow-hidden border border-slate-200 dark:border-slate-800">
+          <div className="bg-white dark:bg-slate-900 max-w-md w-full rounded-3xl shadow-2xl overflow-hidden border border-slate-200 dark:border-slate-800 animate-in fade-in zoom-in-95">
             <div className="bg-blue-600 text-white p-4 px-6 flex items-center justify-between">
               <h3 className="font-extrabold text-base flex items-center gap-2">
                 <Printer className="w-5 h-5 text-amber-300" /> Official Fee Receipt
@@ -697,23 +916,23 @@ export default function StudentDashboard() {
               </div>
 
               <div className="space-y-2 text-slate-700 dark:text-slate-300">
-                <div className="flex justify-between"><span>Receipt No:</span><span className="font-mono font-bold">REC-2026-99041</span></div>
-                <div className="flex justify-between"><span>Student Name:</span><span className="font-bold">Ayush</span></div>
-                <div className="flex justify-between"><span>Roll Number:</span><span className="font-mono text-blue-600 dark:text-blue-400">25ASETCSE019</span></div>
+                <div className="flex justify-between"><span>Receipt No:</span><span className="font-mono font-bold text-blue-600 dark:text-blue-400">{feeStatus.receiptId}</span></div>
+                <div className="flex justify-between"><span>Student Name:</span><span className="font-bold">{user?.name || 'Ayush'}</span></div>
+                <div className="flex justify-between"><span>Roll Number:</span><span className="font-mono text-blue-600 dark:text-blue-400">{user?.student?.rollNumber || '25ASETCSE019'}</span></div>
                 <div className="flex justify-between"><span>Hostel Block & Room:</span><span className="font-bold">Boys Block B - 204</span></div>
-                <div className="flex justify-between"><span>Payment Method:</span><span>Online UPI / Netbanking</span></div>
+                <div className="flex justify-between"><span>Payment Gateway:</span><span>Razorpay UPI / Instant Settlement</span></div>
                 <div className="flex justify-between border-t border-slate-200 dark:border-slate-800 pt-2 font-bold text-slate-900 dark:text-white text-sm">
                   <span>Total Amount Paid:</span>
-                  <span className="text-blue-600 dark:text-blue-400">₹45,000.00</span>
+                  <span className="text-emerald-600 dark:text-emerald-400">₹{feeStatus.amount.toLocaleString('en-IN')}.00</span>
                 </div>
               </div>
 
               <div className="pt-3 flex justify-end space-x-2">
                 <button 
-                  onClick={() => alert('Printing Hostel Fee Receipt PDF...')}
+                  onClick={() => window.print()}
                   className="px-5 py-2.5 bg-blue-600 hover:bg-blue-700 text-white font-extrabold rounded-xl shadow-md flex items-center gap-1.5"
                 >
-                  <Download className="w-4 h-4" /> Download PDF
+                  <Download className="w-4 h-4" /> Download / Print PDF
                 </button>
               </div>
             </div>

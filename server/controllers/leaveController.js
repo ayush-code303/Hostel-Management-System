@@ -21,6 +21,11 @@ const applyLeave = async (req, res) => {
         status: 'pending'
       };
       mockLeaves.unshift(newLeave);
+
+      if (req.io) {
+        req.io.emit('leave:applied', newLeave);
+      }
+
       return sendSuccess(res, 'Outstation leave request submitted (Mock Mode)', newLeave, 201);
     }
 
@@ -34,6 +39,10 @@ const applyLeave = async (req, res) => {
       reason,
       status: 'pending'
     });
+
+    if (req.io) {
+      req.io.emit('leave:applied', leave);
+    }
 
     return sendSuccess(res, 'Outstation leave request submitted successfully', leave, 201);
   } catch (error) {
@@ -79,19 +88,24 @@ const reviewLeaveStatus = async (req, res) => {
     const { status, reviewComments } = req.body;
 
     if (mongoose.connection.readyState !== 1) {
-      const found = mockLeaves.find(l => l._id === req.params.id) || mockLeaves[0];
+      const found = mockLeaves.find(l => l._id === req.params.id || l.id === req.params.id) || mockLeaves[0];
       found.status = status;
-      found.reviewComments = reviewComments || 'Reviewed by Warden';
-      if (status === 'approved') {
+      found.reviewComments = reviewComments || 'Reviewed and authorized by Hostel Warden';
+      if (status === 'approved' || status === 'Approved') {
         found.gatePassCode = `PASS-SUA-2026-${Math.floor(100 + Math.random() * 900)}`;
       }
+
+      if (req.io) {
+        req.io.emit('leave:reviewed', found);
+      }
+
       return sendSuccess(res, `Leave request has been ${status} (Mock Mode)`, {
         leave: found,
         gatePassCode: found.gatePassCode
       });
     }
 
-    const leave = await Leave.findById(req.params.id);
+    const leave = await Leave.findById(req.params.id).populate({ path: 'student', populate: { path: 'user' } });
     if (!leave) return sendError(res, 'Leave request not found', 404);
 
     leave.status = status;
@@ -99,10 +113,74 @@ const reviewLeaveStatus = async (req, res) => {
     leave.reviewedBy = req.user.id;
     await leave.save();
 
-    const passCode = status === 'approved' ? `PASS-SUA-2026-${leave._id.toString().slice(-4).toUpperCase()}` : null;
+    const passCode = (status === 'approved' || status === 'Approved') 
+      ? `PASS-SUA-2026-${leave._id.toString().slice(-4).toUpperCase()}` 
+      : null;
+
+    if (req.io) {
+      req.io.emit('leave:reviewed', { leave, gatePassCode: passCode });
+    }
+
     return sendSuccess(res, `Leave request has been ${status}`, { leave, gatePassCode: passCode });
   } catch (error) {
     return sendError(res, error.message || 'Error reviewing leave request', 500, error);
+  }
+};
+
+const getGatePassDetails = async (req, res) => {
+  try {
+    const leaveId = req.params.id;
+
+    if (mongoose.connection.readyState !== 1) {
+      const matched = mockLeaves.find(l => l._id === leaveId || l.id === leaveId) || mockLeaves[0];
+      const code = matched.gatePassCode || `PASS-SUA-2026-${Math.floor(100 + Math.random() * 900)}`;
+      const qrPayload = JSON.stringify({
+        token: code,
+        name: matched.student?.name || 'Ayush',
+        roll: matched.student?.rollNumber || '25ASETCSE019',
+        room: matched.student?.room || '204',
+        hostel: 'Nelson Mandela Boys Hostel (Block B)',
+        dates: matched.dates || '12 Sep - 14 Sep 2026',
+        status: 'VERIFIED_GATE_PASS'
+      });
+
+      return sendSuccess(res, 'Digital QR Gate Pass generated (Mock Mode)', {
+        passId: code,
+        studentName: matched.student?.name || 'Ayush',
+        rollNumber: matched.student?.rollNumber || '25ASETCSE019',
+        hostel: 'Nelson Mandela Boys Hostel (Block B)',
+        room: matched.student?.room || '204',
+        validDates: matched.dates || '12 Sep - 14 Sep 2026',
+        reason: matched.reason || 'Home Visit Weekend',
+        status: matched.status || 'Approved',
+        qrPayload
+      });
+    }
+
+    const leave = await Leave.findById(leaveId).populate({ path: 'student', populate: { path: 'user' } });
+    if (!leave) return sendError(res, 'Leave request not found', 404);
+
+    const code = `PASS-SUA-2026-${leave._id.toString().slice(-4).toUpperCase()}`;
+    const qrPayload = JSON.stringify({
+      token: code,
+      name: leave.student?.user?.name || 'Student',
+      roll: leave.student?.rollNumber || 'N/A',
+      validFrom: leave.startDate,
+      validUntil: leave.endDate,
+      status: leave.status.toUpperCase()
+    });
+
+    return sendSuccess(res, 'Digital QR Gate Pass generated', {
+      passId: code,
+      studentName: leave.student?.user?.name,
+      rollNumber: leave.student?.rollNumber,
+      validDates: `${new Date(leave.startDate).toLocaleDateString()} to ${new Date(leave.endDate).toLocaleDateString()}`,
+      reason: leave.reason,
+      status: leave.status,
+      qrPayload
+    });
+  } catch (error) {
+    return sendError(res, error.message || 'Error generating QR gate pass', 500);
   }
 };
 
@@ -110,5 +188,6 @@ module.exports = {
   applyLeave,
   getMyLeaves,
   getAllLeaves,
-  reviewLeaveStatus
+  reviewLeaveStatus,
+  getGatePassDetails
 };

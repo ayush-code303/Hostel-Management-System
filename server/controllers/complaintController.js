@@ -21,6 +21,11 @@ const createComplaint = async (req, res) => {
         status: 'pending'
       };
       mockComplaints.unshift(newCmp);
+
+      if (req.io) {
+        req.io.emit('complaint:created', newCmp);
+      }
+
       return sendSuccess(res, 'Complaint lodged successfully (Mock Mode)', newCmp, 201);
     }
 
@@ -35,6 +40,10 @@ const createComplaint = async (req, res) => {
       priority: priority || 'medium',
       status: 'pending'
     });
+
+    if (req.io) {
+      req.io.emit('complaint:created', complaint);
+    }
 
     return sendSuccess(res, 'Complaint lodged successfully', complaint, 201);
   } catch (error) {
@@ -79,6 +88,11 @@ const updateComplaintStatus = async (req, res) => {
       const found = mockComplaints.find(c => c._id === req.params.id || c.id === req.params.id) || mockComplaints[0];
       found.status = status;
       if (resolutionNotes) found.resolutionNotes = resolutionNotes;
+
+      if (req.io) {
+        req.io.emit('complaint:resolved', found);
+      }
+
       return sendSuccess(res, `Complaint status updated to ${status} (Mock Mode)`, found);
     }
 
@@ -87,11 +101,15 @@ const updateComplaintStatus = async (req, res) => {
 
     complaint.status = status;
     if (resolutionNotes) complaint.resolutionNotes = resolutionNotes;
-    if (status === 'resolved') {
+    if (status === 'resolved' || status === 'Resolved') {
       complaint.resolvedBy = req.user.id;
       complaint.resolvedAt = new Date();
     }
     await complaint.save();
+
+    if (req.io) {
+      req.io.emit('complaint:resolved', complaint);
+    }
 
     return sendSuccess(res, `Complaint status updated to ${status}`, complaint);
   } catch (error) {

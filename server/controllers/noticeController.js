@@ -39,6 +39,11 @@ const createNotice = async (req, res) => {
         createdAt: new Date().toISOString()
       };
       mockNotices.unshift(newNotice);
+
+      if (req.io) {
+        req.io.emit('notice:new', newNotice);
+      }
+
       return sendSuccess(res, 'Notice broadcasted successfully (Mock Mode)', newNotice, 201);
     }
 
@@ -50,6 +55,10 @@ const createNotice = async (req, res) => {
       isPinned: isPinned || false,
       publishedBy: req.user.id
     });
+
+    if (req.io) {
+      req.io.emit('notice:new', notice);
+    }
 
     return sendSuccess(res, 'Notice broadcasted successfully', notice, 201);
   } catch (error) {
@@ -63,9 +72,13 @@ const deleteNotice = async (req, res) => {
       return sendSuccess(res, 'Notice removed (Mock Mode)');
     }
 
-    const notice = await Notice.findByIdAndDelete(req.params.id);
+    const notice = await Notice.findById(req.params.id);
     if (!notice) return sendError(res, 'Notice not found', 404);
-    return sendSuccess(res, 'Notice removed successfully');
+
+    notice.isActive = false;
+    await notice.save();
+
+    return sendSuccess(res, 'Notice deleted successfully');
   } catch (error) {
     return sendError(res, error.message || 'Error deleting notice', 500, error);
   }
