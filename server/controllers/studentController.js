@@ -1,6 +1,8 @@
+const mongoose = require('mongoose');
 const Student = require('../models/Student');
 const User = require('../models/User');
 const { sendSuccess, sendError } = require('../utils/response');
+const { mockStudents } = require('../utils/mockData');
 
 /**
  * @desc    Get all students (with search, filter, pagination)
@@ -10,14 +12,37 @@ const { sendSuccess, sendError } = require('../utils/response');
 const getAllStudents = async (req, res) => {
   try {
     const { search, department, year, page = 1, limit = 50 } = req.query;
-    let query = {};
 
-    if (department && department !== 'All') {
-      query.department = department;
+    // Mock Mode Fallback
+    if (mongoose.connection.readyState !== 1) {
+      let filtered = [...mockStudents];
+
+      if (department && department !== 'All') {
+        filtered = filtered.filter(s => s.department === department);
+      }
+      if (year && year !== 'All') {
+        filtered = filtered.filter(s => s.year === Number(year));
+      }
+      if (search) {
+        const term = search.toLowerCase();
+        filtered = filtered.filter(s =>
+          s.user.name.toLowerCase().includes(term) ||
+          s.rollNumber.toLowerCase().includes(term) ||
+          s.department.toLowerCase().includes(term)
+        );
+      }
+
+      return sendSuccess(res, 'Students retrieved successfully (Mock Mode)', {
+        total: filtered.length,
+        page: Number(page),
+        limit: Number(limit),
+        students: filtered
+      });
     }
-    if (year && year !== 'All') {
-      query.year = Number(year);
-    }
+
+    let query = {};
+    if (department && department !== 'All') query.department = department;
+    if (year && year !== 'All') query.year = Number(year);
 
     let students = await Student.find(query)
       .populate('user', 'name email avatar isActive')
@@ -27,7 +52,6 @@ const getAllStudents = async (req, res) => {
       })
       .sort({ createdAt: -1 });
 
-    // In-memory text search if search query is provided
     if (search) {
       const term = search.toLowerCase();
       students = students.filter(s => 
@@ -59,6 +83,11 @@ const getAllStudents = async (req, res) => {
  */
 const getStudentById = async (req, res) => {
   try {
+    if (mongoose.connection.readyState !== 1) {
+      const found = mockStudents.find(s => s._id === req.params.id) || mockStudents[0];
+      return sendSuccess(res, 'Student retrieved successfully (Mock Mode)', found);
+    }
+
     const student = await Student.findById(req.params.id)
       .populate('user', 'name email avatar isActive')
       .populate({
@@ -83,20 +112,18 @@ const getStudentById = async (req, res) => {
  */
 const updateStudent = async (req, res) => {
   try {
-    const { department, year, phone, guardianPhone, address, status } = req.body;
+    if (mongoose.connection.readyState !== 1) {
+      const found = mockStudents.find(s => s._id === req.params.id) || mockStudents[0];
+      Object.assign(found, req.body);
+      return sendSuccess(res, 'Student record updated (Mock Mode)', found);
+    }
 
     const student = await Student.findById(req.params.id);
     if (!student) {
       return sendError(res, 'Student not found', 404);
     }
 
-    if (department) student.department = department;
-    if (year) student.year = year;
-    if (phone) student.phone = phone;
-    if (guardianPhone) student.guardianPhone = guardianPhone;
-    if (address) student.address = address;
-    if (status) student.status = status;
-
+    Object.assign(student, req.body);
     await student.save();
 
     return sendSuccess(res, 'Student record updated successfully', student);
@@ -112,12 +139,15 @@ const updateStudent = async (req, res) => {
  */
 const deleteStudent = async (req, res) => {
   try {
+    if (mongoose.connection.readyState !== 1) {
+      return sendSuccess(res, 'Student removed (Mock Mode)');
+    }
+
     const student = await Student.findById(req.params.id);
     if (!student) {
       return sendError(res, 'Student not found', 404);
     }
 
-    // Delete associated User account
     await User.findByIdAndDelete(student.user);
     await Student.findByIdAndDelete(req.params.id);
 

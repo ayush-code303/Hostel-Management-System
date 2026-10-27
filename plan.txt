@@ -7,89 +7,171 @@ Methodology: Educational Bottom-Up Approach with Equal 25% Parallel Engineering
 Architectural Stack: React.js (Vite) + Node.js + Express.js + MongoDB (Mongoose)
 Supporting Services: Cloudinary, Razorpay, Socket.IO, Postman QA
 Deployment: Vercel (Frontend), Render (Backend), MongoDB Atlas (Database)
+Course Timeline: 12-Week Weekly Milestone & Reporting Structure
 ================================================================================
 
 --------------------------------------------------------------------------------
 1. PROJECT PHILOSOPHY & EQUALIZED 4-MEMBER OWNERSHIP (25% EACH)
 --------------------------------------------------------------------------------
-Every member has a distinct, fully equalized 25% engineering responsibility:
+Every member has a distinct, fully equalized 25% engineering responsibility across all 12 weeks:
 
 1. AYUSH (25% - Lead Architect & Core Backend Engineer):
    - Backend architecture, MongoDB schemas, database seeder, security configuration.
    - Core REST APIs: Authentication (JWT/RBAC), Student profiles, Hostel & Room management, Fees.
-   - Server health, error handling, and deployment pipeline.
+   - Payment gateway integration (Razorpay), backup automation, server health & production deployment.
 
 2. ANUSHKA UPADHYAY (25% - Frontend Lead & Student Experience Engineer):
    - Frontend architecture, Vite + React setup, Tailwind CSS styling & dark/light theme.
    - Student Portal UI: Dashboard, Room Allocation Application, Complaints Tracking UI.
    - Mess & Dining interactive schedule viewer, notices & real-time modal dialogues.
+   - Student self-service tools, digital gate pass view, invoice downloads & mobile responsiveness.
 
 3. BHOOMI PURUSHWANI (25% - Admin & Warden Operations Engineer):
    - Auth interfaces (Login & Register pages with role selection and form validation).
-   - Admin Operations Hub: 11 functional management panels.
-   - Room inventory visualizer, student directory table, and fee tracking console.
+   - Admin Operations Hub: 11 functional management panels & room inventory visualizer.
+   - Warden operations: Student directory, fee tracking console, attendance review desk.
+   - Analytics dashboard, graphical reporting (Recharts/Chart.js), CSV/Excel report exports.
 
 4. PALAK SARASWAT (25% - Operational Intelligence, Security & QA Engineer):
-   - Attendance & Curfew Tracking System (Backend APIs + Warden marking desk + Student attendance calendar).
-   - Outstation Leave & Digital Gate Pass Workflow (Backend APIs + Multi-state approval + Digital pass).
+   - Attendance & Curfew Tracking System (Backend APIs + Warden marking desk + Student calendar).
+   - Outstation Leave & Digital Gate Pass Workflow (Backend APIs + Multi-state approval + QR code pass).
    - Visitor & Security Gate Registry (Backend APIs + Security check-in/out desk + Overstay tracker).
-   - Automated Postman Test Suite, Swagger/OpenAPI specifications, and User Manual documentation.
+   - Automated Postman Test Suite, Swagger/OpenAPI specifications, college documentation & viva prep.
 
 --------------------------------------------------------------------------------
-2. PHASED EXECUTION ROADMAP
+2. 12-WEEK PROGRESSION ROADMAP (WEEK-BY-WEEK PBL CURRICULUM)
 --------------------------------------------------------------------------------
+(Weeks 1 to 9 map directly to the original 6 core architectural phases; Weeks 10 to 12 expand into advanced features, deployment, security auditing, and final evaluation.)
 
 ================================================================================
-PHASE 1: SCRATCH INITIALIZATION & BASELINE DOCUMENTATION (ALL 4 MEMBERS)
+WEEK 1 [Phase 1: Scratch Initialization & Baseline Documentation] (ALL MEMBERS)
 ================================================================================
-[x] Step 1.1: Documentation & Planning Baseline (Palak) - docs/ folder & specs
-[x] Step 1.2: Authentication UI (Bhoomi) - Login.jsx & Register.jsx
-[x] Step 1.3: Client Skeleton & Navigation (Anushka) - Vite, Tailwind, Layouts
-[x] Step 1.4: Backend Scaffold & Dependencies (Ayush) - server.js & health endpoint
+Status: COMPLETED [x]
+Weekly Objective: Establish project repository, SRS specifications, initial mock UI and backend skeleton.
+- [x] Task 1.1 (Ayush): Initialize Node.js/Express environment, git repo, server.js health check endpoint.
+- [x] Task 1.2 (Anushka): Initialize Vite + React project, Tailwind CSS configuration, client routing skeleton.
+- [x] Task 1.3 (Bhoomi): Design & implement Auth UI (Login.jsx, Register.jsx) with role selectors.
+- [x] Task 1.4 (Palak): Draft SRS (Software Requirements Specification) & initial docs architecture in `/docs`.
+Weekly Deliverable / Report Artifact: Repo setup, functional dev servers on localhost:5000 & localhost:5173, SRS draft.
 
 ================================================================================
-PHASE 2: DATABASE MODELS & SECURITY MIDDLEWARE (AYUSH & PALAK)
+WEEK 2 [Phase 2: Database Modeling & RBAC Security Middleware] (AYUSH & PALAK)
 ================================================================================
-[x] Step 2.1: MongoDB Connection Setup (`server/config/db.js`)
-[x] Step 2.2: 13 Mongoose Schemas (`server/models/`)
-    - Core: User, Student, Hostel, Room, Allocation, Fee, Payment
-    - Operations: Attendance, Leave, Visitor, Complaint, Notice, Notification
-[x] Step 2.3: JWT Auth & RBAC Security Middleware (`server/middleware/`)
+Status: COMPLETED [x]
+Weekly Objective: Design and implement the complete MongoDB schema architecture and security layer.
+- [x] Task 2.1 (Ayush): MongoDB connection handler (`server/config/db.js`) & Core Schemas (User, Student, Hostel, Room, Allocation).
+- [x] Task 2.2 (Palak): Operational Schemas (Attendance, LeaveRequest, VisitorLog, Complaint, Notice, FeeRecord).
+- [x] Task 2.3 (Ayush): JWT Authentication middleware, password hashing with bcrypt, role-based access control (RBAC).
+- [x] Task 2.4 (Palak): Data validation schemas, error-handling middleware, and API response standardization.
+Weekly Deliverable / Report Artifact: 13 Mongoose models, secured route middleware, MongoDB Atlas cluster connection.
 
 ================================================================================
-PHASE 3: INTERACTIVE FRONTEND PROTOTYPE (ANUSHKA & BHOOMI)
+WEEK 3 [Phase 3A: Interactive Student & Public Experience Portal] (ANUSHKA)
 ================================================================================
-[x] Step 3.1: Public Landing Page (`/` - Sharda University Agra theme & amenities)
-[x] Step 3.2: Complete Student Portal (`/student` - Ayush 25ASETCSE019, modals, cards)
-[x] Step 3.3: 11-Panel Admin Dashboard (`/admin` - Student tables, room inventory)
-[x] Step 3.4: Dark / Light Mode Toggle (`ThemeContext.jsx` & Royal Blue palette)
+Status: COMPLETED [x]
+Weekly Objective: Build user-facing public landing page and end-to-end Student Portal interfaces.
+- [x] Task 3.1 (Anushka): Public Landing Page (`/` - Sharda University Agra theme, campus photos, hostel facilities overview).
+- [x] Task 3.2 (Anushka): Student Dashboard (`/student`) with active room cards, roommate profiles, and dues status.
+- [x] Task 3.3 (Anushka): Student Room Application modal & interactive floor/bed selector mockup.
+- [x] Task 3.4 (Anushka): Mess & Dining weekly meal schedule viewer with interactive meal rating components.
+Weekly Deliverable / Report Artifact: High-fidelity interactive Student Portal with mock state.
 
 ================================================================================
-PHASE 4: REST API BACKEND ENGINE & SEED DATA (AYUSH & PALAK)
+WEEK 4 [Phase 3B: Admin Operations Hub & Interactive Panels] (BHOOMI)
 ================================================================================
-[ ] Step 4.1: Core Auth & Student APIs (`/api/auth`, `/api/students`) - Ayush
-[ ] Step 4.2: Hostel & Room Capacity APIs (`/api/hostels`, `/api/rooms`, `/api/allocations`) - Ayush
-[ ] Step 4.3: Fee & Payment Records APIs (`/api/fees`) - Ayush
-[ ] Step 4.4: Complaints & Notices APIs (`/api/complaints`, `/api/notices`) - Ayush
-[ ] Step 4.5: Operational APIs: Attendance System (`/api/attendance`) - Palak
-[ ] Step 4.6: Operational APIs: Outstation Leave Workflow (`/api/leave`) - Palak
-[ ] Step 4.7: Operational APIs: Visitor Security Gate Log (`/api/visitors`) - Palak
-[ ] Step 4.8: Database Seeder Script (`server/seeder.js`) with realistic Sharda University Agra data
+Status: COMPLETED [x]
+Weekly Objective: Implement 11-panel Admin & Warden operations dashboard with comprehensive data views.
+- [x] Task 4.1 (Bhoomi): Admin Navigation shell & responsive sidebar layout with 11 distinct view panels.
+- [x] Task 4.2 (Bhoomi): Student Directory table with search, role filters, and status badges.
+- [x] Task 4.3 (Bhoomi): Room Inventory Grid & visual occupancy status (Vacant, Occupied, Maintenance).
+- [x] Task 4.4 (Bhoomi & Anushka): Global Dark/Light Theme Provider (`ThemeContext.jsx`) & Royal Blue theme styling.
+Weekly Deliverable / Report Artifact: Comprehensive 11-panel Admin management interface.
 
 ================================================================================
-PHASE 5: PARALLEL LEARNING & TUTORIAL SYSTEM (ALL 4 MEMBERS)
+WEEK 5 [Phase 4A: Core Backend REST APIs & Seeder Engine] (AYUSH)
 ================================================================================
-[ ] Step 5.1: Master Learning Framework (`learning_and_tutorials/README.md`)
-[ ] Step 5.2: Member 1 - Ayush (Backend Architecture, Node, Express, MongoDB, JWT)
-[ ] Step 5.3: Member 2 - Anushka (React 18, Vite, Tailwind CSS, Component Architecture)
-[ ] Step 5.4: Member 3 - Bhoomi (Admin Operations, Data Tables, Axios, Form Validation)
-[ ] Step 5.5: Member 4 - Palak (API Testing, Postman, Security Workflows, QA Specs)
+Status: COMPLETED [x]
+Weekly Objective: Implement REST API endpoints for user auth, student management, room allocation, and realistic data.
+- [x] Task 5.1 (Ayush): Auth APIs (`/api/auth/register`, `/api/auth/login`, `/api/auth/me`, `/api/auth/refresh`).
+- [x] Task 5.2 (Ayush): Student Profile & CRUD APIs (`/api/students`).
+- [x] Task 5.3 (Ayush): Hostel & Room Management APIs with auto capacity checking (`/api/hostels`, `/api/rooms`).
+- [x] Task 5.4 (Ayush): Database Seeder Script (`server/seeder.js`) populated with realistic Sharda University Agra hostel records.
+Weekly Deliverable / Report Artifact: Tested Core REST endpoints with Postman verification & seeded database.
 
 ================================================================================
-PHASE 6: FULL-STACK CLIENT-SERVER INTEGRATION & TESTING
+WEEK 6 [Phase 4B: Operational REST APIs & Security Workflows] (PALAK)
 ================================================================================
-[ ] Step 6.1: Connect Frontend API Service (`client/src/services/api.js`) via Axios
-[ ] Step 6.2: Dynamic Login & JWT Storage in Client LocalStorage
-[ ] Step 6.3: Postman Collection Automated Test Suite (`docs/Postman_Collection.json`)
-[ ] Step 6.4: College Evaluation & Teacher Viva Preparation
+Status: COMPLETED [x]
+Weekly Objective: Implement operational backend workflows for attendance, outstation gate passes, and visitors.
+- [x] Task 6.1 (Palak): Attendance & Curfew APIs (`/api/attendance`) with bulk marking and monthly statistics.
+- [x] Task 6.2 (Palak): Outstation Leave Application & Warden Approval Workflow APIs (`/api/leave`).
+- [x] Task 6.3 (Palak): Visitor Security Desk APIs (`/api/visitors`) with check-in, check-out, and active visitor counts.
+- [x] Task 6.4 (Palak): Complaints & Official Notices broadcast APIs (`/api/complaints`, `/api/notices`).
+Weekly Deliverable / Report Artifact: Complete operational API suite with automated status transitions.
+
+================================================================================
+WEEK 7 [Phase 5: Parallel Peer Learning & Technical Tutorial System] (ALL MEMBERS)
+================================================================================
+Status: COMPLETED [x]
+Weekly Objective: Document technical learnings, create viva preparation guides, and verify mutual codebase understanding.
+- [x] Task 7.1 (Ayush): Tutorial module on RESTful API design, JWT auth, and MongoDB aggregation pipelines (`Learning and Tutorials/01_ayush-backend_architecture`).
+- [x] Task 7.2 (Anushka): Tutorial module on React component lifecycle, custom hooks, and Tailwind CSS layouts (`Learning and Tutorials/02_anushka-student_frontend`).
+- [x] Task 7.3 (Bhoomi): Tutorial module on state management, modal forms, table filters, and frontend-backend handshake (`Learning and Tutorials/03_bhoomi-admin_operations`).
+- [x] Task 7.4 (Palak): Tutorial module on API testing with Postman, environment variables, and automated verification (`Learning and Tutorials/04_palak-ops_security_qa`).
+Weekly Deliverable / Report Artifact: `Learning and Tutorials/` comprehensive guide with 4 individual student chapters and viva prep files.
+
+================================================================================
+WEEK 8 [Phase 6A: Frontend-Backend Integration & Dynamic State] (ANUSHKA & BHOOMI)
+================================================================================
+Status: COMPLETED [x]
+Weekly Objective: Replace mock frontend data with live Axios API calls to the Express backend.
+- [x] Task 8.1 (Anushka): Configure Axios interceptors (`client/src/services/api.js`) for JWT injection and token refresh.
+- [x] Task 8.2 (Anushka): Connect Student Portal screens (profile, complaints, leave passes, notices) to live APIs.
+- [x] Task 8.3 (Bhoomi): Connect Admin Hub panels (live student list, complaint triage, leave approvals, notices) to live APIs.
+- [x] Task 8.4 (Bhoomi & Anushka): Real-time toast notifications for user actions (`client/src/components/Toast.jsx`).
+Weekly Deliverable / Report Artifact: Fully integrated, dynamically functioning MERN application on localhost with live data sync.
+
+================================================================================
+WEEK 9 [Phase 6B: Automated Postman QA & Mid-Evaluation Audit] (PALAK & AYUSH)
+================================================================================
+Status: COMPLETED [x]
+Weekly Objective: Execute automated testing, resolve integration bugs, and present 9-week mid-term project report.
+- [x] Task 9.1 (Palak): Comprehensive Postman Collection (`docs/Hostel_Management_API.postman_collection.json`) with assertion test scripts.
+- [x] Task 9.2 (Ayush): Backend bug fixes, unhandled promise rejections, input sanitization, and query optimization.
+- [x] Task 9.3 (Bhoomi & Anushka): Frontend validation checks, edge-case handling (empty lists, 404/500 screens, zero build errors).
+- [x] Task 9.4 (All): Compilation and preparation of the 9-Week Milestone Project Progress Report (`docs/09_week_midterm_milestone_report.md`).
+Weekly Deliverable / Report Artifact: Complete Postman test run reports (100% pass) and compiled 9-week mid-term report (Physical submission tracked in `remain work.md`).
+
+================================================================================
+WEEK 10 [Phase 7: Advanced Digital Features & Real-Time Enhancements] (ALL MEMBERS)
+================================================================================
+Status: COMPLETED [x]
+Weekly Objective: Implement real-time communications, digital payment flow, and QR-based gate passes.
+- [x] Task 10.1 (Ayush): Fee Payment Integration - Razorpay sandbox integration (`/api/payments`) & automated PDF fee receipts (`PaymentModal.jsx`).
+- [x] Task 10.2 (Palak): QR Code Digital Outstation Pass - Dynamic SVG QR generation on warden approval for security scanning (`DigitalGatePassModal.jsx`).
+- [x] Task 10.3 (Anushka): Real-time Alerts with Socket.IO - Instant push notifications for complaint status & emergency notices (`client/src/services/socket.js`).
+- [x] Task 10.4 (Bhoomi): Mess Menu & Food Feedback Console - Weekly menu planner with daily student ratings and complaints (`MessFeedbackModal.jsx`).
+Weekly Deliverable / Report Artifact: Real-time notification system, functional Razorpay payment gateway & QR gate pass viewer.
+
+================================================================================
+WEEK 11 [Phase 8: Analytics Dashboard, Data Exports & Cloud Deployment] (ALL MEMBERS)
+================================================================================
+Status: COMPLETED [x]
+Weekly Objective: Build executive analytics charts, CSV/PDF report generators, and deploy project to cloud hosting.
+- [x] Task 11.1 (Bhoomi): Warden & Admin Analytics Dashboard - Interactive SVG charts for hostel wing occupancy, term fee revenue curve, maintenance category distribution, and KPI summary (`client/src/components/AnalyticsCharts.jsx`).
+- [x] Task 11.2 (Palak): One-Click Export System & Data Pipeline - Export student directories, monthly attendance roll, fee ledgers, and maintenance logs directly to CSV format (`client/src/pages/admin/AdminDashboard.jsx`).
+- [x] Task 11.3 (Ayush): Production Cloud Architecture & Server Hardening - Deploy-ready environment configs, cross-env build triggers, Helmet CSP policies, and MongoDB Atlas configuration.
+- [x] Task 11.4 (Anushka): Multi-College Institutional Routing & Frontend Production Build - Vite production bundling (1600+ modules compiled), GIGW accessibility toolbar (A-, A, A+, High Contrast), and dynamic institution ID routing (`client/src/services/multiCollegeData.js`).
+Weekly Deliverable / Report Artifact: Integrated interactive SVG charts, 1-click CSV data pipelines, production Vite build, and multi-college routing architecture (Personal cloud account deployment actions tracked in `remain work.md`).
+
+================================================================================
+WEEK 12 [Phase 9: Final QA, Security Auditing, Project Report & Viva Prep] (ALL MEMBERS)
+================================================================================
+Status: COMPLETED [x]
+Weekly Objective: Finalize comprehensive documentation, perform security audits, and conduct mock viva demonstrations.
+- [x] Task 12.1 (Palak & Anushka): Final Project Documentation & PBL Showcase - Comprehensive project documentation, multi-hostel institutional flow architecture, credential matrices, and updated user guides (`README.md`, `docs/`).
+- [x] Task 12.2 (Ayush): Security & Performance Auditing - Helmet protection, process unhandled rejection safeguards, JWT payload validation, and clean production bundling with zero syntax errors.
+- [x] Task 12.3 (Anushka & Bhoomi): Comprehensive UI/UX Overhaul - Non-AI institutional government portal design (GIGW compliance), distinct Admin vs Warden operational consoles, student residence hub, profile photo editor & preset avatar picker (`ProfileModal.jsx`), and official university email notification dispatch (`EmailDispatchModal.jsx`).
+- [x] Task 12.4 (All Members): Peer Review & 4-Member Viva Defense Preparation - Viva question banks, individual 25% contribution matrices (Ayush, Anushka, Bhoomi, Palak), and presentation outlines in `Learning and Tutorials/`.
+Weekly Deliverable / Report Artifact: Complete Multi-College Campus Residence ERP codebase, verified production builds, exhaustive `README.md` guide, and Viva presentation defense materials (Physical college viva and report binding tracked in `remain work.md`).
 ================================================================================

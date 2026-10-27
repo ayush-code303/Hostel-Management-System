@@ -72,6 +72,7 @@ export const leaveAPI = {
   getMyLeaves: () => api.get('/leave/my-leaves'),
   getAll: (params) => api.get('/leave', { params }),
   review: (id, data) => api.put(`/leave/${id}/status`, data),
+  getGatePass: (id) => api.get(`/leave/${id}/gate-pass`),
 };
 
 export const visitorAPI = {
@@ -99,6 +100,17 @@ export const feeAPI = {
   getMyFees: () => api.get('/fees/my-fees'),
   generate: (data) => api.post('/fees', data),
   pay: (id, data) => api.post(`/fees/${id}/pay`, data),
+};
+
+export const paymentAPI = {
+  createOrder: (data) => api.post('/payments/create-order', data),
+  verify: (data) => api.post('/payments/verify', data),
+};
+
+export const messAPI = {
+  getMenu: () => api.get('/mess/menu'),
+  getFeedback: () => api.get('/mess/feedback'),
+  submitFeedback: (data) => api.post('/mess/feedback', data),
 };
 
 export default api;

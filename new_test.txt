@@ -1,0 +1,275 @@
+# 🏨 National Campus Residence & Multi-Hostel ERP Platform
+### *An Enterprise-Grade, GIGW-Compliant Multi-Institution Higher Education Hostel Management System*
+
+![React](https://img.shields.io/badge/Frontend-React_18_%7C_Vite_5-61DAFB?style=for-the-badge&logo=react&logoColor=black)
+![Node.js](https://img.shields.io/badge/Backend-Node.js_%7C_Express-339933?style=for-the-badge&logo=node.js&logoColor=white)
+![MongoDB](https://img.shields.io/badge/Database-MongoDB_Atlas-47A248?style=for-the-badge&logo=mongodb&logoColor=white)
+![Tailwind](https://img.shields.io/badge/Styling-Tailwind_CSS_3-38B2AC?style=for-the-badge&logo=tailwind-css&logoColor=white)
+![GIGW](https://img.shields.io/badge/Compliance-GIGW_Accessibility_A%2B-0052CC?style=for-the-badge)
+
+---
+
+## 🏛️ Project Showcase & Academic Overview
+
+This project was engineered as a comprehensive, end-to-end Capstone Project for the **Project-Based Learning (PBL) Course** at the **Department of Computer Science & Engineering**, Academic Session 2026–2027.
+
+Designed intentionally as an enterprise-grade institutional government portal rather than generic web templates, the platform addresses the complex logistical realities of university residential campuses: multi-campus federation, distinct administrative oversight vs ground warden operations, biometric night roll call, verifiable digital gate passes, and multi-tenant data pipelines.
+
+### 👥 4-Member Engineering Ownership Matrix (Equal 25% Distribution)
+
+| Member | Roll Number | Specialized PBL Responsibility | Primary Engineering Artifacts |
+|---|---|---|---|
+| **Ayush** | `25ASETCSE019` | **Lead Backend Architect & Cloud Systems** (25%) | RESTful APIs, JWT Auth, Razorpay Sandbox Controller, MongoDB Schemas, Process Security Guard |
+| **Anushka Upadhyay** | `25ASETCSE022` | **Lead Frontend Architect & UI/UX Specialist** (25%) | React 18 SPA Architecture, GIGW Accessibility Toolbar, Multi-College Routing Engine, Student Residence Hub |
+| **Bhoomi Purushwani** | `25ASETCSE035` | **Operations Hub & Analytics Specialist** (25%) | Executive Command Center, SVG Analytics Suite, 1-Click CSV Export Pipeline, Warden Night Roll Call Desk |
+| **Palak Saraswat** | `25ASETCSE048` | **Security Workflows, QA Automation & Documentation** (25%) | Automated Postman Test Suites, Dynamic SVG QR Gate Pass Generator, Official HTML Email Dispatcher |
+
+---
+
+## 🌐 Multi-College Dynamic ID Auto-Detection Engine
+
+Unlike standard single-hostel apps, this platform features an **Automated Institutional Identification & Routing Engine** (`client/src/services/multiCollegeData.js`). 
+
+When any resident, warden, or director inputs their Institutional ID or University Email into the Single Sign-On console, the platform dynamically parses the prefix pattern and credentials to detect their institution, campus wing, room, and security permissions before routing them to their dedicated, branded portal:
+
+```
+┌────────────────────────────────────────────────────────┐
+│  Single Sign-On Input: ID or Institutional Email      │
+│  (e.g., "25ASETCSE019" or "ayush@agra.sharda.ac.in")   │
+└──────────────────────────┬─────────────────────────────┘
+                           │
+             ┌─────────────▼─────────────┐
+             │ Regex & Pattern Matching  │
+             │ ID Prefix Parsing Engine  │
+             └─────────────┬─────────────┘
+                           │
+       ┌───────────────────┼───────────────────┐
+       ▼                   ▼                   ▼
+┌──────────────┐    ┌──────────────┐    ┌──────────────┐
+│ Sharda Univ. │    │  DTU Delhi   │    │  IIT Delhi   │
+│     Agra     │    │  Campus Hub  │    │  Nilgiri Wing│
+│ [25ASET...]  │    │  [2026DTU..] │    │  [2026IIT..] │
+└──────┬───────┘    └──────┬───────┘    └──────┬───────┘
+       │                   │                   │
+       └───────────────────┼───────────────────┘
+                           │
+             ┌─────────────▼─────────────┐
+             │ Role-Based Routing Filter │
+             └─────────────┬─────────────┘
+       ┌───────────────────┼───────────────────┐
+       ▼                   ▼                   ▼
+┌──────────────┐    ┌──────────────┐    ┌──────────────┐
+│ Executive    │    │ Warden Desk  │    │ Resident     │
+│ Command Ctr  │    │ & Roll Call  │    │ Self-Service │
+│  (/admin)    │    │  (/warden)   │    │  (/student)  │
+└──────────────┘    └──────────────┘    └──────────────┘
+```
+
+### Supported Institutional Ecosystems
+1. **Sharda University Agra (Lead Institution)**
+   - *Campuses:* Main Campus, Keetham, Agra (U.P.)
+   - *Hostels:* Nelson Mandela Boys Hostel (Block B), Mother Teresa Girls Hostel (Block A)
+   - *ID Pattern:* Prefix `25ASET...` or domain `@agra.sharda.ac.in`
+2. **Delhi Technological University (DTU Delhi)**
+   - *Campuses:* Bawana Road, Shahbad Daulatpur, Delhi
+   - *Hostels:* Sir C.V. Raman Boys Hostel, Kalpana Chawla Girls Hostel
+   - *ID Pattern:* Prefix `2026DTU...` or domain `@dtu.ac.in`
+3. **Indian Institute of Technology Delhi (IIT Delhi)**
+   - *Campuses:* Hauz Khas, New Delhi
+   - *Hostels:* Nilgiri Hostel, Kailash Girls Hostel
+   - *ID Pattern:* Prefix `2026IIT...` or domain `@iitd.ac.in`
+4. **Banaras Hindu University (BHU Varanasi)**
+   - *Campuses:* Varanasi Campus, Uttar Pradesh
+   - *Hostels:* Raja Ram Mohan Roy Hostel, Gargi Girls Wing
+   - *ID Pattern:* Prefix `2026BHU...` or domain `@bhu.ac.in`
+
+---
+
+## 🏛️ Government & Institutional UI Design (GIGW Compliance)
+
+The user interface follows the **Guidelines for Indian Government Websites (GIGW)** and institutional design standards:
+
+- **Accessibility Strip (`AccessibilityToolbar`):**
+  - **Text Resizing:** Dynamic Root `rem` scaling: `A-` (0.875rem), `A` (1rem Normal), `A+` (1.125rem Large) for vision accessibility.
+  - **High-Contrast Mode:** 1-click toggling of high-contrast monochrome themes with enhanced borders (`border-yellow-400 bg-black text-white`).
+  - **Live IST Digital Clock:** Synchronized Asian/Kolkata timezone digital clock ticking live in real-time.
+  - **Toll-Free National Helpline:** Instant-dial direct emergency campus dispatch (`1800-180-2026`).
+- **Dynamic University Emblem & Accreditation Badges:** Verified NAAC A+ accreditation emblems, UGC/AICTE statutory clearance ribbons, and live campus notification tickers.
+- **Micro-Animations & Visual Hierarchy:** Subdued government styling, professional data tables, responsive stat cards, and clean typography.
+
+---
+
+## 🛡️ Clear Role Separation: Admin vs Warden vs Student
+
+The system strictly divides administrative responsibilities to mirror actual campus operations:
+
+### 1. 👨‍💼 University Directorate / Executive Admin (`/admin`)
+Designed for University Deans, Hostel Directors, and Chief Registrars.
+- **Macro Campus Analytics Suite (`AnalyticsCharts.jsx`):**
+  - *Hostel Wing Occupancy:* SVG bar charts comparing Boys Block B, Girls Block A, and PG Wings.
+  - *2026–27 Term Fee Revenue:* Interactive SVG revenue curves showing monthly collections vs overdue arrears.
+  - *Maintenance Breakdown:* Category distribution visualization (HVAC, Plumbing, Electrical, Wi-Fi).
+  - *Executive KPIs:* Total resident capacity, live occupancy rate, active hostel wings, pending grievances.
+- **1-Click Data Pipeline & CSV Exporters:**
+  - Export Resident Scholars Directory to CSV.
+  - Export Monthly Curfew & Attendance Roll to CSV.
+  - Export Term Fee Collections & Payment Ledgers to CSV.
+  - Export Facility Maintenance Ticket Logs to CSV.
+- **Campus Governance:** Multi-hostel capacity configuration, institutional notices, fee structures, and directorate announcements.
+
+### 2. 🛡️ Warden Ground Operations Desk (`/warden`)
+Designed for Floor Wardens, Wing In-Charges, and Security Supervisors.
+- **09:30 PM Night Biometric Roll Call:**
+  - Real-time resident attendance roster with 1-click individual marking (`Present`, `Leave`, `Late Entry`, `Absent`).
+  - "Mark All In-House Present" batch action for rapid evening roll calls.
+  - Real-time wing headcount percentage meter.
+- **Outstation Gate Pass Triage & Official Email Dispatch:**
+  - Review weekend outstation gate pass requests with parental contact verification.
+  - Approval generates a verifiable gate pass token (`PASS-SUA-2026-XXX`).
+  - **Official University Email Dispatch Modal (`EmailDispatchModal.jsx`):** Generates an official university-formatted HTML departure slip sent via simulated SMTP to the student, parent CC, and security gatehouse.
+- **Maintenance Dispatch Console:** Assign HVAC, electrical, and plumbing tickets to physical campus technicians (`Rajesh HVAC Tech`, `Campus IT Desk`, etc.).
+- **Campus Gatehouse Visitor Logs:** Track visiting parents/guardians, arrival times, and campus clearance exit statuses.
+- **Hostel Wing Bulletin & Mess Monitoring:** Broadcast wing-level alerts and monitor dining ratings.
+
+### 3. 👨‍🎓 Resident Scholar Portal (`/student`)
+Designed for hostel residents for complete self-service.
+- **Academic Profile & Resident Identity:** Room number, bed assignment, allocated wing, chief warden contact, and emergency desk.
+- **Profile Photo & Avatar Customizer (`ProfileModal.jsx`):** 
+  - Upload custom profile photo or choose from 6 institutional scholar avatars.
+  - Update emergency contact numbers, medical alerts, and blood group.
+  - Changes instantly persist to local storage and application state.
+- **Verifiable Dynamic SVG QR Outstation Gate Pass (`DigitalGatePassModal.jsx`):**
+  - Approved passes generate an encrypted SVG QR Code readable by campus security guards.
+  - Complete with digital seal, validity timestamps, and resident credentials.
+- **Digital Fee Collection & Razorpay Payment Simulator (`PaymentModal.jsx`):**
+  - Instant fee payment checkout with card, UPI, and net banking options.
+  - Automatic generation of an official printable A4 PDF Fee Receipt with QR validation stamp.
+- **Mess Menu Timetable & Dining Rating (`MessFeedbackModal.jsx`):**
+  - Interactive daily mess timetable (Breakfast, Lunch, Snacks, Dinner).
+  - 5-star rating console with meal quality feedback dispatched directly to the warden desk.
+- **Room Maintenance Grievance Ticketing:** Submit repair requests with category, priority, and live status tracking (`Pending Review`, `In Progress`, `Resolved`).
+
+---
+
+## 🔑 Evaluator Quick-Demo Credentials Table
+
+The login portal features **1-Click Demo Evaluation Chips** to test all roles immediately without manual typing:
+
+| Role | Name & Designation | Demo ID / Username | Password | Auto-Detected Portal |
+|---|---|---|---|---|
+| **Student** | Ayush (Scholar) | `25ASETCSE019` | `student123` | Sharda University Agra Resident Hub |
+| **Warden** | Prof. Virendra Verma | `warden@agra.sharda.ac.in` | `warden123` | Boys Block B Ground Operations Desk |
+| **Admin** | Campus Directorate | `admin@agra.sharda.ac.in` | `admin123` | Multi-Hostel Executive Command Center |
+| **Student (DTU)** | Rohan Sharma | `2026DTUCSE042` | `student123` | DTU Delhi Sir C.V. Raman Hostel Portal |
+| **Warden (DTU)** | Dr. S. K. Gupta | `warden@dtu.ac.in` | `warden123` | DTU Delhi Warden Desk |
+| **Admin (DTU)** | DTU Directorate | `admin@dtu.ac.in` | `admin123` | DTU Executive Command Hub |
+
+---
+
+## 💻 Tech Stack & Architecture
+
+```
+Hostel-Management-System/
+├── client/                     # Frontend Application (React 18 + Vite 5 + Tailwind)
+│   ├── src/
+│   │   ├── assets/             # Institutional logos & badges (Sharda emblem, etc.)
+│   │   ├── components/         # Modular enterprise UI components
+│   │   │   ├── AnalyticsCharts.jsx      # Interactive SVG Analytics Suite
+│   │   │   ├── DigitalGatePassModal.jsx # Dynamic SVG QR Code Gate Pass
+│   │   │   ├── EmailDispatchModal.jsx   # Official University Email Dispatcher
+│   │   │   ├── MessFeedbackModal.jsx    # 5-Star Mess Menu & Rating Console
+│   │   │   ├── Navbar.jsx               # GIGW Top Bar, IST Clock & College Switcher
+│   │   │   ├── PaymentModal.jsx         # Razorpay Sandbox & PDF Receipt Engine
+│   │   │   ├── ProfileModal.jsx         # Profile Details & Photo Uploader
+│   │   │   ├── Sidebar.jsx              # Role-Aware Navigation Console
+│   │   │   └── Toast.jsx                # Non-intrusive Real-Time Notifications
+│   │   ├── context/
+│   │   │   ├── AuthContext.jsx          # Institutional Auth & Profile State
+│   │   │   └── ThemeContext.jsx         # GIGW Font Scaling & High Contrast Engine
+│   │   ├── layouts/
+│   │   │   └── MainLayout.jsx           # Government Portal Shell
+│   │   ├── pages/
+│   │   │   ├── LandingPage.jsx          # GIGW Public Portal & ID Routing Simulator
+│   │   │   ├── admin/AdminDashboard.jsx # Executive Command Center & CSV Exporters
+│   │   │   ├── auth/Login.jsx           # Smart SSO with Live ID Detection Badges
+│   │   │   ├── auth/Register.jsx        # Multi-College Bed Allocation Registration
+│   │   │   ├── student/StudentDashboard.jsx # Resident Self-Service Portal
+│   │   │   └── warden/WardenDashboard.jsx   # Night Roll Call & Operations Desk
+│   │   └── services/
+│   │       ├── api.js                   # Axios Interceptors & Endpoint Handlers
+│   │       ├── multiCollegeData.js      # Multi-Institution Database & ID Matcher
+│   │       └── socket.js                # WebSocket Real-Time Connection
+├── server/                     # Backend API Service (Node.js + Express + Socket.IO)
+│   ├── config/db.js            # MongoDB Atlas Connection Guard
+│   ├── controllers/            # Business Logic & Request Handlers (12 Controllers)
+│   ├── models/                 # Mongoose Data Schemas (User, Student, Hostel, etc.)
+│   ├── routes/                 # Express REST Endpoints (12 Route Modules)
+│   ├── seeder.js               # Multi-College Database Population Engine
+│   └── server.js               # Express + Socket.IO Server with Helmet & Morgan
+├── docs/                       # Project Documentation & Postman Automated Test Suite
+└── Learning and Tutorials/     # 4-Member Comprehensive Viva Guides & PBL Reports
+```
+
+---
+
+## ⚡ Quick Start & Local Execution
+
+### Prerequisites
+- **Node.js** (v18.x or v20.x recommended)
+- **npm** (v9.x or v10.x)
+- *Optional:* MongoDB instance (app runs in zero-setup high-fidelity mock mode automatically if MongoDB is offline)
+
+### 1. Installation
+Clone the repository and install dependencies:
+```powershell
+# Install client dependencies
+cd client
+npm install
+
+# Install server dependencies
+cd ../server
+npm install
+```
+
+### 2. Launch Development Servers
+Open two terminal windows:
+
+**Terminal 1 (Backend Server):**
+```powershell
+cd server
+npm start
+# Server starts on http://localhost:5000 with Socket.IO and Helmet security
+```
+
+**Terminal 2 (Frontend Client):**
+```powershell
+cd client
+npm run dev
+# Vite server starts on http://localhost:5173
+```
+
+### 3. Verification & Production Build
+To verify production bundle compilation:
+```powershell
+cd client
+npm run build
+# Compiles 1600+ modules with zero errors into client/dist
+```
+
+---
+
+## 🎓 Evaluation & Viva Defense Guidelines
+
+For examiners, evaluators, and viva reviewers:
+1. Navigate to [`Learning and Tutorials/`](Learning%20and%20Tutorials/) to review the **individual technical tutorial chapters and viva defense question banks** prepared for each of the 4 group members:
+   - `01_ayush-backend_architecture`: RESTful design, MongoDB indexing, Razorpay webhook simulation, Helmet headers.
+   - `02_anushka-student_frontend`: React state lifting, GIGW A+/High-contrast CSS tokens, dynamic ID detection regex.
+   - `03_bhoomi-admin_operations`: Real-time SVG chart geometry calculations, CSV blob generation, batch attendance state.
+   - `04_palak-ops_security_qa`: Postman test assertions, dynamic SVG QR mathematical matrix generation, email template compilation.
+2. Review [`docs/09_week_midterm_milestone_report.md`](docs/09_week_midterm_milestone_report.md) for the 9-week milestone sign-off.
+3. Review [`remain work.md`](remain%20work.md) for the checklist of physical viva defense and report submission steps.
+
+---
+
+### © 2026–2027 Department of Computer Science & Engineering • PBL Course Project
+*Crafted with precision by Ayush, Anushka Upadhyay, Bhoomi Purushwani, and Palak Saraswat.*
