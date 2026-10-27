@@ -24,6 +24,7 @@ import {
 import { Link } from 'react-router-dom';
 import { ThemeToggleButton } from '../../context/ThemeContext';
 import { useAuth } from '../../context/AuthContext';
+import Navbar from '../../components/Navbar';
 import { complaintAPI, leaveAPI, feeAPI, noticeAPI } from '../../services/api';
 import socket from '../../services/socket';
 import Toast from '../../components/Toast';
@@ -33,7 +34,7 @@ import MessFeedbackModal from '../../components/MessFeedbackModal';
 import shardaLogo from '../../assets/sharda_logo.png';
 
 export default function StudentDashboard() {
-  const { user, logout } = useAuth();
+  const { user, logout, institution } = useAuth();
 
   // Active Modals: 'complaint' | 'leave' | 'mess' | 'receipt' | 'payment' | 'qrpass' | null
   const [activeModal, setActiveModal] = useState(null);
@@ -261,58 +262,8 @@ export default function StudentDashboard() {
       {/* Toast Notification Popup */}
       <Toast message={toast.message} type={toast.type} onClose={() => setToast({ message: '', type: 'info' })} />
 
-      {/* Student Navbar with Circular Logo */}
-      <header className="bg-white dark:bg-slate-900 border-b border-blue-100 dark:border-slate-800 sticky top-0 z-30 shadow-sm transition-colors">
-        <div className="container mx-auto px-4 py-3 flex items-center justify-between">
-          
-          <div className="flex items-center space-x-3">
-            <Link to="/" className="w-10 h-10 rounded-full overflow-hidden bg-blue-600 p-0.5 shadow-md shadow-blue-500/20 flex items-center justify-center shrink-0 border-0">
-              <img src={shardaLogo} alt="Sharda Logo" className="w-full h-full object-cover rounded-full" />
-            </Link>
-            <div>
-              <div className="flex items-center gap-2">
-                <h1 className="text-base font-extrabold text-slate-900 dark:text-white leading-none">Student Residence Portal</h1>
-                <span className="text-[10px] bg-emerald-100 dark:bg-emerald-950 text-emerald-800 dark:text-emerald-300 font-extrabold px-1.5 py-0.5 rounded border-0">
-                  ● Verified Active
-                </span>
-              </div>
-              <p className="text-xs text-blue-600 dark:text-blue-400 font-bold uppercase mt-0.5">Sharda University Agra</p>
-            </div>
-          </div>
-
-          <div className="flex items-center space-x-3">
-            <ThemeToggleButton />
-
-            <button 
-              onClick={() => showToast(`You have ${notices.length} active announcements from Chief Warden Office.`, 'info')}
-              className="relative p-2 text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-slate-800 rounded-xl transition-colors"
-            >
-              <Bell className="w-5 h-5" />
-              <span className="absolute top-1.5 right-1.5 w-2 h-2 bg-blue-600 rounded-full animate-ping"></span>
-            </button>
-
-            <div className="flex items-center space-x-3 pl-3 border-l border-slate-200 dark:border-slate-800">
-              <img 
-                src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=120&q=80" 
-                alt="Ayush Avatar"
-                className="w-9 h-9 rounded-full object-cover border-2 border-blue-600 shadow-sm"
-              />
-              <div className="hidden md:block text-left text-xs">
-                <p className="font-extrabold text-slate-900 dark:text-white leading-tight">{user?.name || 'Ayush'}</p>
-                <p className="text-slate-500 dark:text-slate-400 font-mono text-[11px]">{user?.student?.rollNumber || '25ASETCSE019'}</p>
-              </div>
-              <button 
-                onClick={logout} 
-                className="p-2 text-slate-400 hover:text-rose-600 dark:hover:text-rose-400 rounded-xl transition-colors" 
-                title="Logout"
-              >
-                <LogOut className="w-4 h-4" />
-              </button>
-            </div>
-          </div>
-
-        </div>
-      </header>
+      {/* Government & Institutional Top Navigation Bar */}
+      <Navbar userRole="Student Resident" />
 
       {/* Main Content Area */}
       <main className="container mx-auto px-4 py-6 flex-1 space-y-6">
@@ -320,20 +271,20 @@ export default function StudentDashboard() {
         {/* Welcome Profile Banner - Royal Blue Gradient */}
         <div className="bg-gradient-to-r from-blue-900 via-blue-800 to-indigo-950 text-white rounded-3xl p-6 lg:p-8 shadow-xl relative overflow-hidden">
           <div className="absolute right-0 bottom-0 opacity-15 pointer-events-none transform translate-x-12 translate-y-12">
-            <img src={shardaLogo} alt="Sharda Logo Watermark" className="w-96 h-96 object-contain" />
+            <img src={institution?.logo || shardaLogo} alt="Institution Logo Watermark" className="w-96 h-96 object-contain" />
           </div>
 
           <div className="relative z-10 grid md:grid-cols-12 gap-6 items-center">
             <div className="md:col-span-8 space-y-3">
               <div className="inline-flex items-center gap-2 bg-white/15 backdrop-blur px-3 py-1 rounded-full text-xs font-bold text-blue-100 border border-white/20">
                 <ShieldCheck className="w-3.5 h-3.5 text-amber-300" />
-                <span>Verified Scholar • Semester 5 (2026-27)</span>
+                <span>Verified Resident Scholar • Academic Year 2026-27</span>
               </div>
               <h2 className="text-3xl sm:text-4xl font-black text-white tracking-tight">
                 Welcome back, {user?.name || 'Ayush'}! 👋
               </h2>
               <p className="text-blue-100 text-xs sm:text-sm font-normal">
-                Computer Science & Engineering | Block B Senior Boys Wing | Room 204
+                {user?.student?.department || 'Computer Science & Engineering'} • {institution?.name || 'Sharda University Agra'}
               </p>
 
               <div className="pt-2 flex flex-wrap gap-2 text-xs">
@@ -361,21 +312,21 @@ export default function StudentDashboard() {
             <div className="md:col-span-4 bg-slate-950/70 backdrop-blur-md p-5 rounded-2xl border border-white/15 text-xs space-y-2.5">
               <div className="flex justify-between items-center text-slate-200">
                 <span className="text-slate-400 font-medium">Hostel Wing:</span>
-                <span className="font-bold text-white">Boys Block B</span>
+                <span className="font-bold text-white">{user?.student?.hostel || 'Nelson Mandela Boys Hostel (Block B)'}</span>
               </div>
               <div className="flex justify-between items-center text-slate-200">
                 <span className="text-slate-400 font-medium">Allocated Room:</span>
                 <span className="font-bold text-cyan-300 bg-blue-500/20 px-2 py-0.5 rounded border border-blue-400/30">
-                  Room 204 (Bed 2)
+                  Room {user?.student?.room || '204'} ({user?.student?.bed || 'Bed 2'})
                 </span>
               </div>
               <div className="flex justify-between items-center text-slate-200">
                 <span className="text-slate-400 font-medium">Chief Warden:</span>
-                <span className="font-semibold text-slate-200">Prof. Virendra Verma</span>
+                <span className="font-semibold text-slate-200">{institution?.hostels?.[0]?.warden?.name || 'Prof. Virendra Verma'}</span>
               </div>
               <div className="flex justify-between items-center text-slate-200">
                 <span className="text-slate-400 font-medium">Emergency Desk:</span>
-                <span className="font-mono text-emerald-400">+91 9876543210</span>
+                <span className="font-mono text-emerald-400">{institution?.contact?.phone || '+91 9876543210'}</span>
               </div>
             </div>
           </div>
